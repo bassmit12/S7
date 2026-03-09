@@ -1,0 +1,66 @@
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Purpose of This Document}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Assumptions and Scope}{1}{section.1.2}%
+\contentsline {chapter}{\numberline {2}Enterprise Context}{2}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Organisation Overview}{2}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Locations}{2}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Organisational Structure}{2}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Core Business Processes}{2}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Business Criticality and Risk Profile}{3}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Key Stakeholders and Their Interests}{4}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Customer Load and Capacity Assumptions}{4}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Summary of Assumptions}{4}{section.2.8}%
+\contentsline {chapter}{\numberline {3}Architecture Method}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Overview}{5}{section.3.1}%
+\contentsline {section}{\numberline {3.2}TOGAF and the Architecture Development Method}{5}{section.3.2}%
+\contentsline {section}{\numberline {3.3}ArchiMate as Modelling Language}{6}{section.3.3}%
+\contentsline {section}{\numberline {3.4}How the Method Influenced This Work}{6}{section.3.4}%
+\contentsline {chapter}{\numberline {4}Enterprise Infrastructure Architecture}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Architectural Principles}{7}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Network Segmentation}{7}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Site: Eindhoven (Primary)}{7}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Perimeter and DMZ}{8}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Application Server Clusters}{8}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Message Broker: RabbitMQ}{8}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Backend: Database Layer}{9}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Management Segment}{9}{subsection.4.3.5}%
+\contentsline {section}{\numberline {4.4}Site: Groningen (Secondary)}{9}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Inter-Site Connectivity}{9}{section.4.5}%
+\contentsline {section}{\numberline {4.6}ArchiMate Technology Layer View}{10}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Architectural Decisions and Trade-offs}{10}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}On-premises vs. Cloud}{10}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}RabbitMQ vs. Kafka}{10}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}PostgreSQL vs. a Single Database Type}{10}{subsection.4.7.3}%
+\contentsline {subsection}{\numberline {4.7.4}Groningen WMS Autonomy}{10}{subsection.4.7.4}%
+\contentsline {chapter}{\numberline {5}Requirements Analysis}{12}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Management Requirements}{12}{section.5.1}%
+\contentsline {section}{\numberline {5.2}User Requirements}{13}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Functional Requirements}{13}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Non-Functional Requirements}{14}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Availability}{14}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Performance}{14}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}Security}{14}{subsection.5.4.3}%
+\contentsline {subsection}{\numberline {5.4.4}Scalability and Capacity}{14}{subsection.5.4.4}%
+\contentsline {chapter}{\numberline {6}Assignments}{16}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Assignment 2 -- Business Service to Technical Service Mapping}{16}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Service Mapping}{16}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Dependency Analysis}{17}{subsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.1.3}Dashboard Design}{17}{subsection.6.1.3}%
+\contentsline {subsubsection}{Design Principles}{17}{subsection.6.1.3}%
+\contentsline {subsubsection}{Dashboard Structure}{17}{subsection.6.1.3}%
+\contentsline {subsubsection}{Tooling Recommendation}{18}{subsection.6.1.3}%
+\contentsline {section}{\numberline {6.2}Assignment 3 -- Status and Performance Monitoring Solution}{18}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Scope and Objectives}{18}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Architecture}{18}{subsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.2.3}Alert Thresholds}{19}{subsection.6.2.3}%
+\contentsline {subsection}{\numberline {6.2.4}Groningen Site Monitoring}{20}{subsection.6.2.4}%
+\contentsline {subsection}{\numberline {6.2.5}SLA Reporting}{20}{subsection.6.2.5}%
+\contentsline {section}{\numberline {6.3}Assignment 7 -- Logging and Forensic Data Collection}{20}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Objectives}{20}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Log Sources}{20}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}Centralised Log Architecture}{21}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}Retention Policy}{22}{subsection.6.3.4}%
+\contentsline {subsection}{\numberline {6.3.5}Forensic Readiness}{22}{subsection.6.3.5}%
+\contentsline {subsection}{\numberline {6.3.6}Information Flow}{22}{subsection.6.3.6}%
+\contentsline {subsection}{\numberline {6.3.7}GDPR Considerations}{23}{subsection.6.3.7}%
+\contentsfinish 

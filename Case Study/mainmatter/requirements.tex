@@ -1,0 +1,126 @@
+% ============================================================
+\chapter{Requirements Analysis}
+\label{chapter:requirements}
+% ============================================================
+
+This chapter applies TOGAF ADM Phase B (Business Architecture) to derive requirements from the enterprise context, stakeholder concerns and identified risks defined in Chapter~\ref{chapter:enterprise-context}. Requirements are not generated from technical preferences; each requirement is explicitly traced to a source.
+
+% -------------------------------------------------------
+\section{Management Requirements}
+% -------------------------------------------------------
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{ID} & \textbf{Source} & \textbf{Requirement} \\
+\midrule
+MR-01 & IT Director & All production infrastructure components must be visible in a single monitoring dashboard, aggregating status, performance and alerts from both sites. \\
+MR-02 & IT Director & Automated alerting must notify on-call IT staff within 2 minutes of a critical component failure (P1 threshold). \\
+MR-03 & Operations Director & Operational dashboards for Order System and Warehouse must be available to non-IT staff (read-only, role-restricted views). \\
+MR-04 & CEO / Board & Monthly availability reports must be generated automatically for the Customer Order System and customer portal, to support SLA validation. \\
+MR-05 & IT Director & All administrative access to production servers must be logged and auditable, traceable to an individual IAM identity. \\
+MR-06 & IT Director & Infrastructure capacity data (CPU, memory, storage trends) must be retained for a minimum of 13 months to support annual capacity planning cycles. \\
+\bottomrule
+\end{tabularx}
+\caption{Management requirements}
+\label{tab:req-mgmt}
+\end{table}
+
+% -------------------------------------------------------
+\section{User Requirements}
+% -------------------------------------------------------
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{ID} & \textbf{Source} & \textbf{Requirement} \\
+\midrule
+UR-01 & Customer Service Team & The customer order portal must be accessible 24/7 with degraded-mode notifications published on a status page when planned maintenance is in progress. \\
+UR-02 & Distribution Staff (EHV, GRN) & The Warehouse Management System must remain operational during a WAN outage between sites (offline mode requirement). \\
+UR-03 & Finance Manager & The Accounting system must provide a complete, immutable audit trail of all financial transactions, accessible to authorised Finance staff for at least 7 years (Dutch fiscal law requirement). \\
+UR-04 & HR Manager & Access to the HR/Payroll system must be role-restricted; no IT staff member may access payroll data without explicit authorisation from the HR Manager. \\
+UR-05 & IT Staff & A jump host with session recording must be the only path to production servers, enabling post-incident forensic review of all administrative sessions. \\
+UR-06 & Retail Customers & The customer portal response time must not exceed 2 seconds for standard order operations under normal load conditions. \\
+\bottomrule
+\end{tabularx}
+\caption{User requirements}
+\label{tab:req-user}
+\end{table}
+
+% -------------------------------------------------------
+\section{Functional Requirements}
+% -------------------------------------------------------
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{ID} & \textbf{Source} & \textbf{Requirement} \\
+\midrule
+FR-01 & Order Management & The Order System must support concurrent processing of at least 10,000 customer transactions per day during seasonal peaks without service degradation. \\
+FR-02 & Warehouse / Distribution & Inventory events from both sites must be synchronised via the RabbitMQ message broker, with guaranteed delivery and replay capability on WAN recovery. \\
+FR-03 & Accounting & Invoice creation events must be published asynchronously by the Order System so that accounting processing does not block the order submission path. \\
+FR-04 & HR / Payroll & Payroll data must be encrypted at rest and in transit. Access must be logged at the application level with user identity, timestamp and action. \\
+FR-05 & IAM / Access & All application access must require SSO authentication through the IAM. Direct database or server access bypassing the IAM is not permitted. \\
+FR-06 & Monitoring & Metrics, logs and health data from all infrastructure components must be collected centrally in the Management VLAN. \\
+FR-07 & Groningen WMS & The WMS node in Groningen must queue write operations locally and replay them to the central cluster when the WAN link is restored. \\
+\bottomrule
+\end{tabularx}
+\caption{Functional requirements}
+\label{tab:req-functional}
+\end{table}
+
+% -------------------------------------------------------
+\section{Non-Functional Requirements}
+% -------------------------------------------------------
+
+\subsection{Availability}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{lllX}
+\toprule
+\textbf{ID} & \textbf{System} & \textbf{Target} & \textbf{Justification} \\
+\midrule
+NFR-AV-01 & Customer Portal & 99.9\% & Revenue-critical; 24/7 customer access. Allows $\leq$8.7 hours downtime per year. \\
+NFR-AV-02 & Order System & 99.9\% & Core revenue process; direct SLA impact on retail customers. \\
+NFR-AV-03 & Warehouse / WMS & 99.5\% (during ops hours) & Operational hours 07:00--18:00; brief degraded mode acceptable outside hours. \\
+NFR-AV-04 & Accounting & 99.0\% & Business-hours only; brief outages outside office hours are acceptable. \\
+NFR-AV-05 & HR / Payroll & 99.0\% & Monthly payroll cycle; sustained availability required only around pay dates. \\
+NFR-AV-06 & IAM / SSO & 99.9\% & A single IAM failure prevents access to all applications; must match portal SLA. \\
+\bottomrule
+\end{tabularx}
+\caption{Availability requirements (NFR)}
+\label{tab:req-availability}
+\end{table}
+
+\subsection{Performance}
+
+\begin{itemize}
+    \item \textbf{NFR-PERF-01:} Customer portal page load time $\leq$ 2 seconds under normal load (1,200 transactions/day). Source: UR-06.
+    \item \textbf{NFR-PERF-02:} Customer portal page load time $\leq$ 5 seconds under peak load (10,000 transactions/day). The web cluster auto-scaling must absorb the 8:1 peak-to-average ratio.
+    \item \textbf{NFR-PERF-03:} RabbitMQ message processing latency $\leq$ 500 ms under normal load. Source: FR-03.
+    \item \textbf{NFR-PERF-04:} Database query response time $\leq$ 200 ms for 95\% of PostgreSQL queries under normal conditions. Source: FR-01.
+    \item \textbf{NFR-PERF-05:} WAN failover (MPLS $\rightarrow$ IPSec VPN) must complete within 60 seconds without manual intervention.
+\end{itemize}
+
+\subsection{Security}
+
+\begin{itemize}
+    \item \textbf{NFR-SEC-01:} All data in transit between VLANs, sites and external parties must be encrypted (TLS 1.2 minimum; TLS 1.3 preferred). Source: legal / GDPR.
+    \item \textbf{NFR-SEC-02:} All data at rest in the HR/Payroll and Accounting clusters must be encrypted using AES-256 or equivalent. Source: UR-04, GDPR.
+    \item \textbf{NFR-SEC-03:} Multi-factor authentication (MFA) must be enforced for all IT staff, management and Finance/HR roles via the IAM. Source: IT Director, risk profile.
+    \item \textbf{NFR-SEC-04:} Firewall rule changes must be logged, version-controlled and require dual approval from IT management. Source: MR-05.
+    \item \textbf{NFR-SEC-05:} Security logs must be retained for a minimum of 12 months online and 36 months in cold storage. Source: GDPR Article 5(1)(e), incident response requirements.
+\end{itemize}
+
+\subsection{Scalability and Capacity}
+
+\begin{itemize}
+    \item \textbf{NFR-CAP-01:} The web cluster must auto-scale horizontally to handle the 8:1 peak-to-average load ratio without manual intervention.
+    \item \textbf{NFR-CAP-02:} MongoDB must be capable of horizontal shard expansion to accommodate customer base growth of up to 300\% without architectural redesign.
+    \item \textbf{NFR-CAP-03:} Storage capacity for all systems must include a minimum 30\% headroom above projected 12-month utilisation.
+    \item \textbf{NFR-CAP-04:} Capacity metrics must trigger a planning review alert when any critical resource exceeds 70\% of provisioned capacity sustained over 7 days.
+\end{itemize}

@@ -1,0 +1,301 @@
+% ============================================================
+\chapter{Enterprise Infrastructure Architecture}
+\label{chapter:infrastructure}
+% ============================================================
+
+\section{Architectural Principles}
+
+The following principles govern all infrastructure design decisions for LogiFlux B.V. They are derived from the enterprise context, stakeholder concerns, and TOGAF's concept of architecture principles as guiding constraints.
+
+\begin{enumerate}
+    \item \textbf{Separation of concerns.} The infrastructure is divided into clearly isolated segments (DMZ, Application, Database, Management, Client). No segment communicates with another unless explicitly required and controlled by a firewall rule.
+    \item \textbf{Defence in depth.} Multiple layers of security controls are applied. External traffic passes through a perimeter firewall before reaching the DMZ. Internal application traffic passes through an additional internal firewall before reaching application servers.
+    \item \textbf{Least privilege access.} Application servers can only be reached through the front-end. Database servers can only be reached by application servers. No direct external access to backend systems is permitted.
+    \item \textbf{High availability.} Business-critical components (web cluster, application clusters, message broker, database clusters) are clustered to eliminate single points of failure. Both sites are independently operational.
+    \item \textbf{Scalability for peak loads.} The front-end web cluster is auto-provisioned to handle the 8:1 peak-to-average customer load ratio. The NoSQL database layer supports high-throughput request handling during peak periods.
+    \item \textbf{Traceability.} Every infrastructure component maps directly to one or more business processes defined in the enterprise context.
+\end{enumerate}
+
+% -------------------------------------------------------
+\section{Network Segmentation}
+% -------------------------------------------------------
+
+The infrastructure is segmented using VLANs. Each VLAN corresponds to a logical security zone. Inter-VLAN traffic is routed through firewall policies, not open routing. The VLAN design is consistent across both sites, with separate IP ranges per site to avoid conflicts.
+
+\begin{table}[ht]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{VLAN ID} & \textbf{Name} & \textbf{Purpose and Key Components} \\
+\midrule
+10 & DMZ & Public-facing services: load balancer, auto-provisioned web cluster, SSL/TLS termination. All inbound internet traffic enters here. \\
+20 & Application & Isolated application server clusters (Order System, Accounting, HR/Payroll, Warehouse). Accessible only via Internal Firewall from DMZ. \\
+30 & Message Broker & RabbitMQ cluster, isolated from both App and DB VLANs. Accessed by App clusters via broker API only. \\
+40 & Database & PostgreSQL (relational) and MongoDB (NoSQL) clusters. No direct access from DMZ or clients. \\
+50 & Management & Monitoring server, jump host, configuration management. Administrative access only via IAM-authenticated session. \\
+60 & Client & Staff Windows endpoints. Outbound internet access via proxy; inbound access to applications via web browser through DMZ. \\
+\bottomrule
+\end{tabularx}
+\caption{VLAN segmentation design for LogiFlux B.V.}
+\label{tab:vlans}
+\end{table}
+
+IP addressing follows a consistent scheme: Eindhoven uses the \texttt{10.0.x.0/24} range (where \texttt{x} is the VLAN ID), and Groningen uses \texttt{10.1.x.0/24}. Inter-site WAN connectivity uses \texttt{10.10.0.0/30}. The IAM server resides in the DMZ at a static address accessible from all VLANs.
+
+% -------------------------------------------------------
+\section{Site: Eindhoven (Primary)}
+% -------------------------------------------------------
+
+Eindhoven is the primary site hosting all core application workloads. It serves both local staff and all external customers.
+
+\subsection{Perimeter and DMZ}
+
+Inbound internet traffic (customer portal, staff remote access) terminates at the perimeter firewall. All allowed traffic is forwarded to the load balancer in the DMZ, which distributes requests across the auto-provisioned web cluster. The web cluster handles HTTP/HTTPS and communicates only with the application layer via the internal firewall.
+
+The \textbf{Identity and Access Management (IAM)} server is co-located in the DMZ at a static address. It provides Single Sign-On (SSO) and role-based access control for all applications. Users authenticate once against the IAM before being granted access to any application, regardless of which cluster handles the request.
+
+\subsection{Application Server Clusters}
+
+Four isolated application clusters run in the Application VLAN. Each cluster is independently deployable and contains a mix of Windows and Linux nodes depending on the application stack's requirements.
+
+\begin{table}[ht]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Cluster} & \textbf{OS Mix} & \textbf{Function} \\
+\midrule
+Customer Order System & Linux & Handles customer order submission, validation, status tracking and the public customer portal. Highest traffic volume; primary consumer of the NoSQL DB for read-heavy requests. \\
+Accounting & Windows & Processes invoices, accounts payable/receivable, financial reporting. Strict audit logging required. Writes exclusively to the relational database. \\
+HR / Salary Administration & Windows & Manages personnel records, payroll, contracts and attendance. High data sensitivity; access restricted by role in IAM. \\
+Goods Storage \& Distribution & Linux & Warehouse management system (WMS): inventory, pick lists, inbound/outbound logistics. Publishes events to RabbitMQ for order fulfilment triggers. \\
+\bottomrule
+\end{tabularx}
+\caption{Application server clusters and their functions}
+\label{tab:appclusters}
+\end{table}
+
+\subsection{Message Broker: RabbitMQ}
+
+A RabbitMQ cluster resides in the dedicated Message Broker VLAN, isolated from both the Application and Database VLANs. It provides asynchronous event-driven communication between application clusters, decoupling producers from consumers and improving resilience during peak load.
+
+The primary message flows are:
+
+\begin{itemize}
+    \item \textbf{Order System $\rightarrow$ Warehouse:} When a customer order is confirmed, an event is published to a queue consumed by the Warehouse cluster. This decouples the order creation flow from warehouse picking, preventing order spikes from directly impacting warehouse throughput.
+    \item \textbf{Order System $\rightarrow$ Accounting:} Confirmed orders trigger invoice creation events consumed by the Accounting cluster asynchronously, keeping financial processing out of the synchronous order path.
+    \item \textbf{Groningen inventory sync:} Inventory updates from the Groningen WMS node are published to a queue and replicated to the Eindhoven Warehouse cluster, ensuring consistent stock levels across sites even during brief WAN interruptions (messages queue and deliver on reconnect).
+\end{itemize}
+
+\subsection{Backend: Database Layer}
+
+The database layer runs in a dedicated DB VLAN with no direct external access. Two clustered database systems are provided:
+
+\begin{itemize}
+    \item \textbf{PostgreSQL (relational):} Serves the Accounting, HR/Payroll and Order System clusters for transactional, structured data requiring ACID compliance. A hot-standby replica in Eindhoven provides failover. A read replica is deployed in Groningen for local WMS queries.
+    \item \textbf{MongoDB (NoSQL):} Serves the Customer Order System for high-throughput, read-heavy customer request handling. Its flexible document model accommodates variable order structures and scales horizontally to absorb peak loads (up to 10,000 transactions per day).
+\end{itemize}
+
+\subsection{Management Segment}
+
+The Management VLAN contains a monitoring server (collecting metrics, logs and health data from all infrastructure components) and a jump host. All administrative access to servers is routed through the jump host, which enforces IAM authentication and session logging. Direct SSH or RDP access from the Client VLAN to production servers is not permitted.
+
+% -------------------------------------------------------
+\section{Site: Groningen (Secondary)}
+% -------------------------------------------------------
+
+Groningen is a secondary distribution site with limited local IT staff. Its infrastructure is designed for operational independence in the event of a WAN failure, while staying synchronised with Eindhoven under normal conditions.
+
+\begin{itemize}
+    \item \textbf{Perimeter firewall:} Provides site-level security and manages the MPLS/VPN WAN connection.
+    \item \textbf{Client VLAN:} Approximately 50 Windows endpoints used by warehouse and distribution staff. Applications are accessed via the customer-facing portal hosted in Eindhoven (browser-based, no local app servers for most functions).
+    \item \textbf{WMS Node:} A local Warehouse Management System node that can operate offline in read/write mode during a WAN outage, using a local database cache. Changes are queued and synchronised via RabbitMQ once the WAN link is restored.
+    \item \textbf{PostgreSQL Read Replica:} A read replica of the Eindhoven PostgreSQL cluster, reducing WAN latency for WMS read queries and providing a local fallback for inventory queries during WAN disruption.
+\end{itemize}
+
+% -------------------------------------------------------
+\section{Inter-Site Connectivity}
+% -------------------------------------------------------
+
+The two sites are connected via:
+
+\begin{itemize}
+    \item \textbf{Primary:} A leased MPLS link providing a guaranteed bandwidth of at least 100~Mbit/s with low latency. This link carries all application traffic between sites, including database replication and RabbitMQ message sync.
+    \item \textbf{Failover:} An internet-based IPSec VPN that activates automatically if the MPLS link fails. The failover link provides reduced bandwidth (minimum 20~Mbit/s) but ensures continuity for critical WMS and database replication traffic.
+\end{itemize}
+
+All inter-site traffic is encrypted at the network layer regardless of whether MPLS or VPN is in use.
+
+% -------------------------------------------------------
+\section{ArchiMate Technology Layer View}
+\label{sec:archimate-view}
+% -------------------------------------------------------
+
+The diagram below presents the technology layer view of the LogiFlux B.V. enterprise infrastructure using ArchiMate notation. Element types are annotated in italic above each element name. Colours indicate the ArchiMate element category per the legend.
+
+\begin{figure}[p]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    amnode/.style={rectangle, draw=black!65, fill=yellow!30, minimum width=2.7cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    amdevice/.style={rectangle, draw=black!65, fill=orange!30, minimum width=2.7cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    amsw/.style={rectangle, draw=black!65, fill=cyan!20, minimum width=2.7cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    amcomnet/.style={rectangle, draw=black!65, fill=green!20, minimum width=2.7cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    zone/.style={rectangle, draw=gray!55, dashed, thick, rounded corners=3pt, inner sep=5pt, fill=gray!6},
+    site/.style={rectangle, draw=black!80, very thick, rounded corners=6pt},
+    flow/.style={-{Stealth[length=2.2mm, width=1.8mm]}, semithick, black!65},
+    assoc/.style={dashed, -{Stealth[length=2.2mm, width=1.8mm]}, black!45}
+]
+
+% ===== SITE BOXES (drawn first, no fill, just borders) =====
+\draw[site] (0.0, 3.8) rectangle (11.8, 23.8);
+\node[font=\small\bfseries] at (5.9, 23.4) {Eindhoven --- Primary Site};
+
+\draw[site] (13.0, 9.2) rectangle (18.8, 22.0);
+\node[font=\small\bfseries] at (15.9, 21.6) {Groningen --- Secondary Site};
+
+% ===== ZONE BOXES (drawn before nodes so nodes appear on top) =====
+% DMZ
+\draw[zone] (0.6, 19.0) rectangle (11.2, 20.8);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (0.8, 20.6) {DMZ};
+
+% App VLAN
+\draw[zone] (0.3, 15.3) rectangle (11.5, 17.2);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (0.5, 17.0) {App VLAN};
+
+% MQ VLAN
+\draw[zone] (3.4, 13.1) rectangle (8.8, 14.8);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (3.6, 14.6) {MQ VLAN};
+
+% DB VLAN
+\draw[zone] (0.4, 10.5) rectangle (11.4, 12.3);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (0.6, 12.1) {DB VLAN};
+
+% Mgmt VLAN
+\draw[zone] (0.4, 8.1) rectangle (11.4, 9.8);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (0.6, 9.6) {Mgmt VLAN};
+
+% Client VLAN EHV
+\draw[zone] (1.8, 5.6) rectangle (9.8, 7.4);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (2.0, 7.2) {Client VLAN};
+
+% GRN zone boxes
+\draw[zone] (13.3, 15.3) rectangle (18.5, 17.2);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (13.5, 17.0) {Client VLAN};
+
+\draw[zone] (13.3, 13.1) rectangle (18.5, 14.8);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (13.5, 14.6) {App VLAN};
+
+\draw[zone] (13.3, 10.5) rectangle (18.5, 12.3);
+\node[font=\tiny\bfseries, text=gray!65, anchor=north west] at (13.5, 12.1) {DB VLAN};
+
+% ===== NODES =====
+% Internet (external, above EHV site)
+\node[amcomnet] (internet) at (3.5, 24.8) {{\tiny\itshape \guillemotleft Network\guillemotright}\\Internet};
+\node[amcomnet] (extusers) at (8.0, 24.8) {{\tiny\itshape \guillemotleft Network\guillemotright}\\External Users};
+
+% EHV Perimeter FW
+\node[amsw] (fw1) at (5.75, 22.5) {{\tiny\itshape \guillemotleft SystemSoftware\guillemotright}\\Perimeter Firewall};
+
+% DMZ nodes
+\node[amnode] (lb) at (2.5, 19.9) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Load Balancer};
+\node[amnode] (web) at (6.0, 19.9) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Web Cluster};
+\node[amnode] (iam) at (9.5, 19.9) {{\tiny\itshape \guillemotleft Node\guillemotright}\\IAM / SSO};
+
+% Internal FW
+\node[amsw] (ifw) at (5.75, 18.2) {{\tiny\itshape \guillemotleft SystemSoftware\guillemotright}\\Internal Firewall};
+
+% App clusters
+\node[amnode] (order) at (1.7,  16.25) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Order System};
+\node[amnode] (acct)  at (4.4,  16.25) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Accounting};
+\node[amnode] (hrp)   at (7.1,  16.25) {{\tiny\itshape \guillemotleft Node\guillemotright}\\HR / Payroll};
+\node[amnode] (wh)    at (9.8,  16.25) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Warehouse};
+
+% MQ
+\node[amnode] (mq) at (6.1, 13.95) {{\tiny\itshape \guillemotleft Node\guillemotright}\\RabbitMQ Cluster};
+
+% DB layer
+\node[amnode] (pgsql) at (3.2, 11.4) {{\tiny\itshape \guillemotleft Node\guillemotright}\\PostgreSQL Cluster};
+\node[amnode] (mongo) at (8.6, 11.4) {{\tiny\itshape \guillemotleft Node\guillemotright}\\MongoDB Cluster};
+
+% Mgmt
+\node[amnode] (mon)  at (3.2, 8.95) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Monitoring Server};
+\node[amnode] (jump) at (8.6, 8.95) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Jump Host};
+
+% EHV Client VLAN
+\node[amdevice] (ecl) at (5.8, 6.5) {{\tiny\itshape \guillemotleft Device\guillemotright}\\Windows Endpoints (approx.\ 80)};
+
+% WAN
+\node[amcomnet] (wan) at (12.2, 13.95) {{\tiny\itshape \guillemotleft Network\guillemotright}\\MPLS + VPN};
+
+% GRN nodes
+\node[amsw]     (gfw)      at (15.9, 20.5)  {{\tiny\itshape \guillemotleft SystemSoftware\guillemotright}\\Perimeter Firewall};
+\node[amdevice] (gcl)      at (15.9, 16.25) {{\tiny\itshape \guillemotleft Device\guillemotright}\\Windows Endpoints (approx.\ 50)};
+\node[amnode]   (gwms)     at (15.9, 13.95) {{\tiny\itshape \guillemotleft Node\guillemotright}\\WMS Node};
+\node[amnode]   (greplica) at (15.9, 11.4)  {{\tiny\itshape \guillemotleft Node\guillemotright}\\PG Read Replica};
+
+% ===== ARROWS =====
+\draw[flow] (internet)  -- (fw1);
+\draw[flow] (extusers)  -- (fw1);
+\draw[flow] (fw1) -- (lb);
+\draw[flow] (lb)  -- (web);
+\draw[assoc] (iam) -- (web);
+\draw[assoc] (iam) -- (ifw);
+\draw[flow] (web) -- (ifw);
+\draw[flow] (ifw) -- (order);
+\draw[flow] (ifw) -- (acct);
+\draw[flow] (ifw) -- (hrp);
+\draw[flow] (ifw) -- (wh);
+\draw[flow] (order) to[bend right=10] (mq);
+\draw[flow] (wh)    to[bend left=10]  (mq);
+\draw[flow] (order) to[bend right=10] (pgsql);
+\draw[flow] (acct)  -- (pgsql);
+\draw[flow] (hrp)   to[bend left=5]   (pgsql);
+\draw[flow] (order) to[bend left=10]  (mongo);
+\draw[flow] (mq)    to[bend right=8]  (pgsql);
+\draw[assoc, dotted] (mon) -- (mq);
+\draw[assoc, dotted] (mon) to[bend right=5] (pgsql);
+
+% WAN connections
+\draw[flow] (wh)    to[bend left=5]  (wan);
+\draw[flow] (mq)    -- (wan);
+\draw[flow, <->] (wan) -- (gfw);
+\draw[flow] (gfw) -- (gcl);
+\draw[flow] (gfw) -- (gwms);
+\draw[flow] (gfw) to[bend right=5] (greplica);
+\draw[assoc] (greplica) to[bend left=5] (pgsql);
+
+% ===== LEGEND =====
+\draw[draw=gray!50, rounded corners=3pt] (0.3, 0.3) rectangle (11.7, 3.4);
+\node[font=\footnotesize\bfseries] at (6.0, 3.0) {Legend};
+\node[amnode,    minimum width=2.2cm, minimum height=0.8cm, font=\tiny] at (2.0,  2.2) {{\tiny\itshape \guillemotleft Node\guillemotright}\\Server/Cluster};
+\node[amsw,      minimum width=2.2cm, minimum height=0.8cm, font=\tiny] at (5.0,  2.2) {{\tiny\itshape \guillemotleft SystemSoftware\guillemotright}\\Firewall/Software};
+\node[amdevice,  minimum width=2.2cm, minimum height=0.8cm, font=\tiny] at (8.0,  2.2) {{\tiny\itshape \guillemotleft Device\guillemotright}\\Endpoint/Device};
+\node[amcomnet,  minimum width=2.2cm, minimum height=0.8cm, font=\tiny] at (11.0, 2.2) {{\tiny\itshape \guillemotleft Network\guillemotright}\\Network/WAN};
+\draw[flow,  semithick] (1.5, 1.2) -- (2.8, 1.2); \node[font=\tiny, anchor=west] at (3.0, 1.2) {Serving / Data flow};
+\draw[assoc, semithick] (6.5, 1.2) -- (7.8, 1.2); \node[font=\tiny, anchor=west] at (8.0, 1.2) {Association (dashed)};
+
+\end{tikzpicture}%
+}
+\caption{ArchiMate Technology Layer View --- LogiFlux B.V. Enterprise Infrastructure}
+\label{fig:archimate-tech}
+\end{figure}
+
+% -------------------------------------------------------
+\section{Architectural Decisions and Trade-offs}
+% -------------------------------------------------------
+
+\subsection{On-premises vs. Cloud}
+
+Sensitive data workloads (HR/Payroll, Accounting) are hosted on-premises to maintain full control over GDPR-governed data and avoid dependency on third-party cloud providers. The Customer Order System and MongoDB layer are candidates for future cloud migration if scaling demands exceed on-premises capacity, particularly given the 8:1 peak-to-average ratio.
+
+\subsection{RabbitMQ vs. Kafka}
+
+RabbitMQ was selected over Apache Kafka for the message broker layer. At LogiFlux's current scale (order of thousands of daily transactions), RabbitMQ's lower operational overhead and simpler queue management model are better suited to a 10-person IT team. Kafka's log-based architecture offers better throughput at much larger scale but introduces significant operational complexity that is disproportionate to LogiFlux's needs.
+
+\subsection{PostgreSQL vs. a Single Database Type}
+
+A deliberate decision was made to deploy both a relational (PostgreSQL) and a NoSQL (MongoDB) database rather than relying on a single database type. The relational model is required for transactional integrity in financial and HR processes. The NoSQL model is required for the high-throughput, read-heavy customer portal workload. Forcing all workloads into a single database type would require either sacrificing ACID compliance for financial data or accepting poor performance on the customer-facing side.
+
+\subsection{Groningen WMS Autonomy}
+
+The Groningen WMS node is designed to continue operating in degraded mode during a WAN outage by using a local PostgreSQL read replica and an offline write queue. This design choice accepts the risk of brief data inconsistency (resolved on WAN recovery via RabbitMQ replay) in exchange for operational continuity at the distribution site. A full WAN outage would otherwise halt all warehouse operations at Groningen.
