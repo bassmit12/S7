@@ -3,18 +3,17 @@
 \label{chapter:infrastructure}
 % ============================================================
 
+This chapter presents the enterprise infrastructure architecture for LogiFlux B.V., covering network segmentation, application topology, inter-site connectivity, and the key design decisions that shaped these choices. All components are traceable to the business processes and stakeholder requirements established in Chapter~\ref{chapter:enterprise-context}.
+
 \section{Architectural Principles}
 
-The following principles govern all infrastructure design decisions for LogiFlux B.V. They are derived from the enterprise context, stakeholder concerns, and TOGAF's concept of architecture principles as guiding constraints.
+Six principles govern all infrastructure design decisions for LogiFlux B.V., derived from the enterprise context and TOGAF's concept of architecture principles as guiding constraints.
 
-\begin{enumerate}
-    \item \textbf{Separation of concerns.} The infrastructure is divided into clearly isolated segments (DMZ, Application, Database, Management, Client). No segment communicates with another unless explicitly required and controlled by a firewall rule.
-    \item \textbf{Defence in depth.} Multiple layers of security controls are applied. External traffic passes through a perimeter firewall before reaching the DMZ. Internal application traffic passes through an additional internal firewall before reaching application servers.
-    \item \textbf{Least privilege access.} Application servers can only be reached through the front-end. Database servers can only be reached by application servers. No direct external access to backend systems is permitted.
-    \item \textbf{High availability.} Business-critical components (web cluster, application clusters, message broker, database clusters) are clustered to eliminate single points of failure. Both sites are independently operational.
-    \item \textbf{Scalability for peak loads.} The front-end web cluster is auto-provisioned to handle the 8:1 peak-to-average customer load ratio. The NoSQL database layer supports high-throughput request handling during peak periods.
-    \item \textbf{Traceability.} Every infrastructure component maps directly to one or more business processes defined in the enterprise context.
-\end{enumerate}
+\textbf{Separation of concerns} divides the infrastructure into clearly isolated network segments --- DMZ, Application, Database, Management, and Client. No segment communicates with another unless explicitly required and controlled by a firewall rule. This supports \textbf{defence in depth}: external traffic passes through a perimeter firewall before reaching the DMZ, and internal application traffic passes through an additional internal firewall before reaching application servers.
+
+\textbf{Least privilege access} means that application servers are reachable only through the web front-end, and database servers are reachable only by application servers. No direct external access to backend systems is permitted. \textbf{High availability} ensures that all business-critical components --- web cluster, application clusters, message broker, database clusters --- are clustered to eliminate single points of failure, with both sites independently operational.
+
+\textbf{Scalability for peak loads} is addressed by auto-provisioning the front-end web cluster to handle the 8:1 peak-to-average customer load ratio, supported by a NoSQL database layer capable of high-throughput read handling during peak periods. Finally, \textbf{traceability} requires that every infrastructure component maps directly to one or more business processes defined in the enterprise context, ensuring no component exists without a justified business need.
 
 % -------------------------------------------------------
 \section{Network Segmentation}
@@ -58,42 +57,19 @@ The \textbf{Identity and Access Management (IAM)} server is co-located in the DM
 
 Four isolated application clusters run in the Application VLAN. Each cluster is independently deployable and contains a mix of Windows and Linux nodes depending on the application stack's requirements.
 
-\begin{table}[ht]
-\centering
-\begin{tabularx}{\textwidth}{llX}
-\toprule
-\textbf{Cluster} & \textbf{OS Mix} & \textbf{Function} \\
-\midrule
-Customer Order System & Linux & Handles customer order submission, validation, status tracking and the public customer portal. Highest traffic volume; primary consumer of the NoSQL DB for read-heavy requests. \\
-Accounting & Windows & Processes invoices, accounts payable/receivable, financial reporting. Strict audit logging required. Writes exclusively to the relational database. \\
-HR / Salary Administration & Windows & Manages personnel records, payroll, contracts and attendance. High data sensitivity; access restricted by role in IAM. \\
-Goods Storage \& Distribution & Linux & Warehouse management system (WMS): inventory, pick lists, inbound/outbound logistics. Publishes events to RabbitMQ for order fulfilment triggers. \\
-\bottomrule
-\end{tabularx}
-\caption{Application server clusters and their functions}
-\label{tab:appclusters}
-\end{table}
+\label{tab:appclusters}Four isolated application clusters run in the Application VLAN, each independently deployable with a mix of Windows and Linux nodes suited to the application's requirements. The \textbf{Customer Order System} cluster runs on Linux and handles customer order submission, validation, status tracking, and the public customer portal; it carries the highest traffic volume and is the primary consumer of the MongoDB layer for read-heavy requests. The \textbf{Accounting} cluster runs on Windows, processing invoices, accounts payable and receivable, and financial reporting --- strict audit logging is required, and it writes exclusively to the relational PostgreSQL database. The \textbf{HR/Salary Administration} cluster also runs on Windows, managing personnel records, payroll, contracts, and attendance data; access is role-restricted via the IAM due to the high sensitivity of payroll data. Finally, the \textbf{Goods Storage and Distribution} cluster runs on Linux, implementing the warehouse management system for inventory, pick lists, and inbound/outbound logistics coordination, and publishes fulfilment trigger events to RabbitMQ.
 
 \subsection{Message Broker: RabbitMQ}
 
 A RabbitMQ cluster resides in the dedicated Message Broker VLAN, isolated from both the Application and Database VLANs. It provides asynchronous event-driven communication between application clusters, decoupling producers from consumers and improving resilience during peak load.
 
-The primary message flows are:
-
-\begin{itemize}
-    \item \textbf{Order System $\rightarrow$ Warehouse:} When a customer order is confirmed, an event is published to a queue consumed by the Warehouse cluster. This decouples the order creation flow from warehouse picking, preventing order spikes from directly impacting warehouse throughput.
-    \item \textbf{Order System $\rightarrow$ Accounting:} Confirmed orders trigger invoice creation events consumed by the Accounting cluster asynchronously, keeping financial processing out of the synchronous order path.
-    \item \textbf{Groningen inventory sync:} Inventory updates from the Groningen WMS node are published to a queue and replicated to the Eindhoven Warehouse cluster, ensuring consistent stock levels across sites even during brief WAN interruptions (messages queue and deliver on reconnect).
-\end{itemize}
+Three primary message flows traverse the broker. When a customer order is confirmed, the Order System publishes an event to a queue consumed by the Warehouse cluster, decoupling the order creation flow from warehouse picking and preventing order spikes from directly impacting warehouse throughput. Confirmed orders also trigger invoice creation events consumed asynchronously by the Accounting cluster, keeping financial processing out of the synchronous order submission path. The third flow handles Groningen inventory synchronisation: inventory updates from the Groningen WMS node are published to a queue and replicated to the Eindhoven Warehouse cluster, ensuring consistent stock levels across sites even during brief WAN interruptions, with messages queuing locally and delivering on reconnect.
 
 \subsection{Backend: Database Layer}
 
 The database layer runs in a dedicated DB VLAN with no direct external access. Two clustered database systems are provided:
 
-\begin{itemize}
-    \item \textbf{PostgreSQL (relational):} Serves the Accounting, HR/Payroll and Order System clusters for transactional, structured data requiring ACID compliance. A hot-standby replica in Eindhoven provides failover. A read replica is deployed in Groningen for local WMS queries.
-    \item \textbf{MongoDB (NoSQL):} Serves the Customer Order System for high-throughput, read-heavy customer request handling. Its flexible document model accommodates variable order structures and scales horizontally to absorb peak loads (up to 10,000 transactions per day).
-\end{itemize}
+\textbf{PostgreSQL} serves the Accounting, HR/Payroll, and Order System clusters for transactional, structured data requiring ACID compliance. A hot-standby replica in Eindhoven provides automated failover, and a read replica is deployed in Groningen for local WMS queries. \textbf{MongoDB} serves the Customer Order System for high-throughput, read-heavy customer request handling; its flexible document model accommodates variable order structures and scales horizontally to absorb peak loads of up to 10,000 transactions per day.
 
 \subsection{Management Segment}
 
@@ -105,23 +81,13 @@ The Management VLAN contains a monitoring server (collecting metrics, logs and h
 
 Groningen is a secondary distribution site with limited local IT staff. Its infrastructure is designed for operational independence in the event of a WAN failure, while staying synchronised with Eindhoven under normal conditions.
 
-\begin{itemize}
-    \item \textbf{Perimeter firewall:} Provides site-level security and manages the MPLS/VPN WAN connection.
-    \item \textbf{Client VLAN:} Approximately 50 Windows endpoints used by warehouse and distribution staff. Applications are accessed via the customer-facing portal hosted in Eindhoven (browser-based, no local app servers for most functions).
-    \item \textbf{WMS Node:} A local Warehouse Management System node that can operate offline in read/write mode during a WAN outage, using a local database cache. Changes are queued and synchronised via RabbitMQ once the WAN link is restored.
-    \item \textbf{PostgreSQL Read Replica:} A read replica of the Eindhoven PostgreSQL cluster, reducing WAN latency for WMS read queries and providing a local fallback for inventory queries during WAN disruption.
-\end{itemize}
+A perimeter firewall provides site-level security and manages the MPLS/VPN WAN connection. The Client VLAN hosts approximately 50 Windows endpoints used by warehouse and distribution staff; applications are accessed via browser through the Eindhoven-hosted portal, with no local application servers required for most functions. A local \textbf{WMS Node} can operate offline in read/write mode during a WAN outage using a local database cache, with changes queued and synchronised via RabbitMQ once the WAN link is restored. A \textbf{PostgreSQL read replica} of the Eindhoven cluster reduces WAN latency for WMS read queries and provides a local fallback for inventory queries during WAN disruption.
 
 % -------------------------------------------------------
 \section{Inter-Site Connectivity}
 % -------------------------------------------------------
 
-The two sites are connected via:
-
-\begin{itemize}
-    \item \textbf{Primary:} A leased MPLS link providing a guaranteed bandwidth of at least 100~Mbit/s with low latency. This link carries all application traffic between sites, including database replication and RabbitMQ message sync.
-    \item \textbf{Failover:} An internet-based IPSec VPN that activates automatically if the MPLS link fails. The failover link provides reduced bandwidth (minimum 20~Mbit/s) but ensures continuity for critical WMS and database replication traffic.
-\end{itemize}
+The primary inter-site link is a leased MPLS connection providing a guaranteed bandwidth of at least 100~Mbit/s with low latency; it carries all application traffic between sites, including database replication and RabbitMQ message sync. An internet-based IPSec VPN serves as automatic failover if the MPLS link fails, providing a minimum of 20~Mbit/s to ensure continuity for critical WMS and database replication traffic.
 
 All inter-site traffic is encrypted at the network layer regardless of whether MPLS or VPN is in use.
 

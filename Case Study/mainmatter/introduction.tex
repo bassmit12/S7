@@ -1,69 +1,30 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-\section{Purpose of This Document}
-
-This document presents the Week 2 architectural foundation for the ICT Infrastructure Case Study. The assignment requires the role of an Enterprise Infrastructure Architect, responsible for researching, designing, justifying and advising on enterprise infrastructure and monitoring solutions.
-
-The approach taken in this document is grounded in TOGAF as the enterprise architecture framework and ArchiMate as the modelling language. Rather than treating infrastructure design as a standalone technical exercise, all decisions are derived from and traced back to the business context, stakeholder needs and identified risks.
-
-This chapter establishes the enterprise context (Step 0), which serves as the foundation for all architectural decisions in subsequent chapters.
+This document presents the architectural foundation for the ICT Infrastructure Case Study, prepared in the role of Enterprise Infrastructure Architect. The approach is grounded in TOGAF as the enterprise architecture framework and ArchiMate as the modelling language, meaning that all infrastructure and monitoring decisions are derived from and traced back to a defined business context, stakeholder needs, and identified risks. No implementation or system administration tasks are within scope --- this document focuses on research, design, and architectural advice.
 
 \section{Assumptions and Scope}
 
-All infrastructure and monitoring designs in this document are based on the enterprise context described below. Where assumptions were made, they are explicitly stated. No implementation or system administration tasks are within scope --- this document focuses on research, design and architectural advice.
+All infrastructure and monitoring designs are based on the enterprise context established in Chapter~\ref{chapter:enterprise-context}. Where assumptions were made, they are explicitly stated. The combined network and functional architecture diagram required by Assignment~1 is embedded in Chapter~\ref{chapter:infrastructure}, Section~\ref{sec:archimate-view}, using ArchiMate notation rendered with TikZ.
 
 % ============================================================
 \chapter{Enterprise Context}
 \label{chapter:enterprise-context}
 % ============================================================
 
+This chapter establishes the organisational foundation from which all architectural decisions in this document are derived. Following TOGAF ADM Phase~A, the organisation, its locations, workforce, core business processes, stakeholders, and risk profile are defined before any technical design begins.
+
 \section{Organisation Overview}
 
-The organisation used throughout this case study is \textbf{LogiFlux B.V.}, a fictitious Dutch regional wholesale distribution company operating in the Fast-Moving Consumer Goods (FMCG) sector. LogiFlux acts as an intermediary between product suppliers and retail customers, managing the full chain from goods intake and warehousing through to order fulfilment and delivery.
-
-\begin{itemize}
-    \item \textbf{Legal form:} Private limited company (B.V.), incorporated in the Netherlands
-    \item \textbf{Sector:} Wholesale distribution --- FMCG
-    \item \textbf{Founded:} 2009
-    \item \textbf{Annual revenue (estimated):} \texteuro 42 million
-    \item \textbf{Customers:} Retail chains, independent supermarkets and hospitality businesses
-\end{itemize}
+\textbf{LogiFlux B.V.} is a fictitious Dutch regional wholesale distribution company operating in the Fast-Moving Consumer Goods (FMCG) sector. Incorporated as a private limited company (B.V.) in the Netherlands in 2009, LogiFlux acts as an intermediary between product suppliers and retail customers, managing the full supply chain from goods intake and warehousing through to order fulfilment and last-mile delivery. The company generates an estimated annual revenue of \texteuro 42 million and serves retail chains, independent supermarkets, and hospitality businesses across the Netherlands.
 
 \section{Locations}
 
-LogiFlux operates from two permanent physical sites:
-
-\begin{itemize}
-    \item \textbf{Eindhoven (HQ + Primary Distribution Centre):} The main site houses the executive team, IT department, finance, HR, customer service and the primary warehouse and distribution operations.
-    \item \textbf{Groningen (Secondary Distribution Centre):} A second warehouse and distribution facility serving customers in the northern Netherlands. This site operates under the management of a regional operations manager reporting to Eindhoven.
-\end{itemize}
-
-The two sites are approximately 220~km apart and are connected via a leased MPLS WAN link with a redundant internet-based VPN failover path.
+LogiFlux operates from two permanent physical sites. The primary site in Eindhoven houses the executive team, IT department, finance, HR, customer service, and the main warehouse and distribution operations. A secondary distribution centre in Groningen serves customers in the northern Netherlands and operates under a regional operations manager reporting to Eindhoven. The two sites are approximately 220~km apart and are connected via a leased MPLS WAN link with a redundant internet-based VPN failover path.
 
 \section{Organisational Structure}
 
-LogiFlux employs approximately 200 staff distributed as follows:
-
-\begin{table}[h]
-\centering
-\begin{tabular}{lll}
-\toprule
-\textbf{Department} & \textbf{Headcount} & \textbf{Primary Site} \\
-\midrule
-Distribution Centre (warehouse, logistics, drivers) & 120 & Both (70 EHV / 50 GRN) \\
-Customer Service & 24 & Eindhoven \\
-Administration (Finance \& HR) & 12 & Eindhoven \\
-IT & 10 & Eindhoven \\
-Management & 8 & Eindhoven \\
-Maintenance \& Support & 26 & Both \\
-\midrule
-\textbf{Total} & \textbf{200} & \\
-\bottomrule
-\end{tabular}
-\caption{Personnel distribution across departments and sites}
-\label{tab:personnel}
-\end{table}
+\label{tab:personnel}LogiFlux employs approximately 200 staff. The largest group consists of 120 employees in distribution centre roles covering warehousing, logistics, and driving, split roughly 70 in Eindhoven and 50 in Groningen. Customer service (24 staff) and administration covering finance and HR (12 staff) are centralised in Eindhoven, alongside the IT department (10 staff) and senior management (8 staff). Maintenance and support roles (26 staff) operate across both sites. The IT team's size --- ten people responsible for the entire infrastructure --- is a significant constraint that drives the requirements for manageability, automation, and centralised monitoring.
 
 \section{Core Business Processes}
 
@@ -81,65 +42,19 @@ The following core business processes drive all infrastructure and monitoring re
 
 \section{Business Criticality and Risk Profile}
 
-LogiFlux operates in a time-sensitive distribution environment. Order processing and warehouse management systems must be available during operational hours, and the customer portal must be accessible at all times.
+LogiFlux operates in a time-sensitive distribution environment, and the criticality of its business processes is reflected directly in how infrastructure availability requirements are set. \label{tab:criticality}Customer Order Management and Goods Storage and Distribution are both high-criticality processes: downtime in either results in lost orders, missed SLAs, contractual penalties, or an operational standstill. Financial Administration and HR carry medium criticality --- outages are disruptive and may trigger regulatory issues, but their immediate revenue impact is lower than a halt in order processing.
 
-\begin{table}[h]
-\centering
-\begin{tabular}{p{4.5cm}p{2cm}p{7cm}}
-\toprule
-\textbf{Business Process} & \textbf{Criticality} & \textbf{Risk / Impact of Downtime} \\
-\midrule
-Customer Order Management & High & Loss of orders, SLA breach, revenue impact, customer churn \\
-Goods Storage \& Distribution & High & Operational standstill, delivery delays, contractual penalties \\
-Financial Administration & Medium & Delayed invoicing, regulatory non-compliance \\
-Salary \& HR Administration & Medium & Payroll errors, GDPR non-compliance, staff dissatisfaction \\
-\bottomrule
-\end{tabular}
-\caption{Business process criticality and risk overview}
-\label{tab:criticality}
-\end{table}
-
-Key risk factors for LogiFlux include:
-
-\begin{itemize}
-    \item \textbf{Seasonal peak loads:} Customer traffic can spike from approximately 1{,}200 to 10{,}000 transactions per day during promotional periods (e.g. holidays, end-of-quarter campaigns). Infrastructure must handle these peaks without degradation.
-    \item \textbf{Single point of failure at Groningen:} The secondary site has limited local IT staff, making remote management and monitoring critical.
-    \item \textbf{Data sensitivity:} Financial records, payroll data and customer purchase histories are all subject to GDPR and must be protected.
-    \item \textbf{Supply chain dependencies:} Integration with supplier systems via EDI creates external dependency risks.
-    \item \textbf{Ransomware and business email compromise:} As a mid-size distribution company with financial transaction exposure, LogiFlux is a realistic target for financially motivated attackers.
-\end{itemize}
+Several risk factors compound this profile. Seasonal promotional periods can cause customer transaction volumes to spike from a daily average of around 1{,}200 to as many as 10{,}000 --- an 8:1 ratio --- meaning infrastructure must absorb peak load without manual intervention. The Groningen site has limited local IT staff, making remote management and monitoring non-negotiable rather than optional. Financial records, payroll data, and customer purchase histories are all subject to GDPR, adding legal obligation to the security requirements. Integration with supplier systems via EDI creates external dependency risks, and LogiFlux's profile as a mid-size distribution company with financial transaction exposure makes it a realistic target for ransomware and business email compromise attacks.
 
 \section{Key Stakeholders and Their Interests}
 
-\begin{table}[ht]
-\centering
-\begin{tabularx}{\textwidth}{lX}
-\toprule
-\textbf{Stakeholder} & \textbf{Interests and Concerns} \\
-\midrule
-CEO / Board & Business continuity, cost efficiency, regulatory compliance, reputation \\
-Operations Director & Availability of order and warehouse systems during operational hours \\
-IT Director & Infrastructure reliability, security posture, manageability, scalability \\
-Finance Manager & Data integrity of accounting systems, audit trails, regulatory compliance \\
-HR Manager & Privacy and integrity of personnel data (GDPR), payroll accuracy \\
-Customer Service Team & Reliable access to the customer order system, fast issue resolution \\
-Retail Customers & Order accuracy, portal availability, delivery reliability, data privacy \\
-Distribution Staff & Reliable warehouse management systems, minimal downtime during shifts \\
-\bottomrule
-\end{tabularx}
-\caption{Key stakeholders and their interests}
-\label{tab:stakeholders}
-\end{table}
+\label{tab:stakeholders}The architecture must serve a range of stakeholders with different concerns, and these concerns ultimately translate into concrete requirements. The CEO and Board are primarily interested in business continuity, cost efficiency, regulatory compliance, and reputational risk. The Operations Director's focus is the uninterrupted availability of order and warehouse systems during operational hours, while the IT Director cares about infrastructure reliability, security posture, manageability, and scalability. The Finance Manager requires data integrity in accounting systems, complete audit trails, and regulatory compliance; the HR Manager prioritises GDPR compliance, payroll accuracy, and role-restricted access to personnel data.
+
+Closer to daily operations, the Customer Service team needs reliable access to the order system and fast issue resolution. Distribution staff at both sites depend on the warehouse management system remaining available throughout their shifts. Retail customers expect order accuracy, portal availability, on-time delivery, and confidence that their data is handled appropriately. These stakeholder concerns are not independent --- they converge on a shared need for infrastructure that is highly available, secure, observable, and traceable to individual identities.
 
 \section{Customer Load and Capacity Assumptions}
 
-\begin{itemize}
-    \item \textbf{Average daily load:} approximately 1{,}200 customer transactions
-    \item \textbf{Peak daily load:} up to 10{,}000 customer transactions (seasonal spikes)
-    \item \textbf{Peak-to-average ratio:} approximately 8:1 --- infrastructure must be designed to handle peak load without significant over-provisioning during baseline periods
-    \item \textbf{Operating hours:} Monday--Friday, 07:00--18:00 for warehouse operations; customer portal available 24/7
-    \item \textbf{Internal users:} approximately 200 concurrent users maximum, with peak usage during morning shift handover (07:00--09:00)
-\end{itemize}
+Average daily customer transaction volume is approximately 1{,}200, rising to up to 10{,}000 during seasonal peaks --- a peak-to-average ratio of roughly 8:1. Infrastructure must therefore be sized for burst capacity rather than steady-state demand, while avoiding permanent over-provisioning. Warehouse operations run Monday to Friday from 07:00 to 18:00; the customer portal must be available around the clock. Internal user concurrency peaks during morning shift handover between 07:00 and 09:00, with a maximum of approximately 200 concurrent users.
 
 \section{Summary of Assumptions}
 
@@ -159,31 +74,11 @@ The following assumptions underpin this entire document:
 \label{chapter:architecture-method}
 % ============================================================
 
-\section{Overview}
-
-This document applies \textbf{TOGAF} (The Open Group Architecture Framework) as its guiding enterprise architecture method, with \textbf{ArchiMate} as the modelling language for expressing architectural views. These are not merely referenced in name --- they actively structure how analysis is conducted, how decisions are documented, and how diagrams are constructed.
+This chapter explains the methodological choices that structure this entire document. TOGAF and ArchiMate are not cited as decorative references --- they actively determine how the analysis is conducted, how decisions are recorded, and how diagrams are constructed.
 
 \section{TOGAF and the Architecture Development Method}
 
-TOGAF's core process is the \textbf{Architecture Development Method (ADM)}, an iterative cycle of phases for developing and maintaining enterprise architecture. For this case study, the following phases are directly applied:
-
-\begin{table}[ht]
-\centering
-\begin{tabularx}{\textwidth}{lX}
-\toprule
-\textbf{ADM Phase} & \textbf{Application in This Document} \\
-\midrule
-Preliminary & Establishing the architectural approach, scope, and principles. Defines that TOGAF and ArchiMate are used and why. \\
-Phase A --- Architecture Vision & Step 0 (Enterprise Context): defining the organisation, stakeholders, business goals and risk profile that drive all architectural decisions. \\
-Phase B --- Business Architecture & Step 3 (Requirements Analysis): deriving requirements from business processes and stakeholder concerns. \\
-Phase C --- Information Systems Architecture & Step 2 (Infrastructure Design): mapping business services to application and data components. \\
-Phase D --- Technology Architecture & Step 2 (Infrastructure Design): designing the physical and virtual infrastructure, network segmentation, server clusters and connectivity. \\
-Phase E --- Opportunities \& Solutions & Step 4 (Monitoring Design): identifying monitoring solutions that address gaps identified during the architecture phases. \\
-\bottomrule
-\end{tabularx}
-\caption{TOGAF ADM phases applied in this document}
-\label{tab:adm}
-\end{table}
+TOGAF's core process is the \textbf{Architecture Development Method (ADM)}, an iterative cycle of phases for developing and maintaining enterprise architecture. \label{tab:adm}This case study directly applies five ADM phases. The Preliminary phase establishes the architectural approach, scope, and principles, including the choice of TOGAF and ArchiMate and the reasoning behind it. Phase~A (Architecture Vision) corresponds to the enterprise context chapter: defining the organisation, stakeholders, business goals, and risk profile before any technical design begins. Phase~B (Business Architecture) drives the requirements analysis in Chapter~\ref{chapter:requirements}, ensuring every requirement is attributed to a stakeholder, business process, or identified risk. Phases~C and~D (Information Systems Architecture and Technology Architecture) together underpin the infrastructure design in Chapter~\ref{chapter:infrastructure}, mapping business services to application and data components and then to the physical and virtual infrastructure. Phase~E (Opportunities and Solutions) informs the monitoring design in the assignments chapter, identifying where monitoring solutions address gaps exposed during the architecture phases.
 
 TOGAF's principle of \textbf{traceability} is applied throughout: every infrastructure component and monitoring decision is traceable back to a business requirement, stakeholder concern, or identified risk defined in the enterprise context.
 
@@ -191,23 +86,10 @@ TOGAF's principle of \textbf{traceability} is applied throughout: every infrastr
 
 ArchiMate is an open modelling language standardised by The Open Group, designed to describe, analyse and visualise enterprise architectures across multiple domains. It is used in this document to produce architecture diagrams that are consistent, unambiguous and layered.
 
-ArchiMate organises elements across three \textbf{layers}:
-
-\begin{itemize}
-    \item \textbf{Business Layer} --- represents business processes, roles, functions and services as experienced by stakeholders (e.g. Customer Order Management, Salary Administration).
-    \item \textbf{Application Layer} --- represents the software applications and services that support business processes (e.g. order management system, IAM/SSO, ERP).
-    \item \textbf{Technology Layer} --- represents the physical and virtual infrastructure that hosts applications (e.g. server clusters, VLANs, firewalls, storage, WAN links).
-\end{itemize}
+ArchiMate organises elements across three layers. The \textbf{Business Layer} represents processes, roles, functions, and services as experienced by stakeholders --- Customer Order Management and Salary Administration are examples at this layer. The \textbf{Application Layer} represents the software applications and services that support those business processes, such as the order management system, IAM/SSO, and ERP. The \textbf{Technology Layer} represents the physical and virtual infrastructure that hosts applications: server clusters, VLANs, firewalls, storage, and WAN links.
 
 Relationships between elements (such as \emph{realisation}, \emph{serving}, \emph{assignment} and \emph{composition}) are used to make dependencies and interactions explicit. This prevents the common pitfall of designing infrastructure in isolation from the business functions it must support.
 
 \section{How the Method Influenced This Work}
 
-The choice of TOGAF and ArchiMate had concrete effects on the structure and content of this document:
-
-\begin{enumerate}
-    \item \textbf{Enterprise context first.} Following ADM Phase A, the enterprise context was defined before any technical design began. Infrastructure choices are consequences of business needs, not the other way around.
-    \item \textbf{Layered diagrams.} All architecture diagrams use ArchiMate notation to clearly separate business, application and technology concerns, making dependencies visible and reviewable.
-    \item \textbf{Stakeholder-driven requirements.} ADM Phase B drives the requirements analysis --- each requirement is attributed to a stakeholder, business process or risk, rather than being a generic technical wish-list.
-    \item \textbf{Justified decisions.} TOGAF's emphasis on architectural decisions with rationale means that every significant infrastructure choice in this document is accompanied by a justification and trade-off discussion.
-\end{enumerate}
+The choice of TOGAF and ArchiMate had concrete effects on the structure and content of this document. Following ADM Phase~A, the enterprise context was defined before any technical design began, so infrastructure choices are consequences of business needs rather than the reverse. All architecture diagrams use ArchiMate notation to clearly separate business, application, and technology concerns, keeping dependencies visible and reviewable by stakeholders at every level. Requirements are attributed to their stakeholder or process source rather than being a generic technical wish-list, and every significant infrastructure choice is accompanied by a justification and trade-off discussion, in line with TOGAF's emphasis on documented architectural decisions with explicit rationale.

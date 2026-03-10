@@ -3,13 +3,7 @@
 \label{chapter:assignments}
 % ============================================================
 
-This chapter addresses four of the seven optional assignments. Assignment~1 (combined network and functional architecture diagram) has already been completed in Chapter~\ref{chapter:infrastructure}, Section~\ref{sec:archimate-view}, using ArchiMate notation and TikZ. The three assignments addressed in full here are:
-
-\begin{itemize}
-    \item \textbf{Assignment 2} --- Map business services to technical services and explain how this mapping could be represented in a dashboard.
-    \item \textbf{Assignment 3} --- Design a solution for status and performance monitoring of all servers.
-    \item \textbf{Assignment 7} --- Design a solution for logging and forensic data collection.
-\end{itemize}
+This chapter addresses four of the seven optional assignments. Assignment~1 (combined network and functional architecture diagram) has already been completed in Chapter~\ref{chapter:infrastructure}, Section~\ref{sec:archimate-view}, using ArchiMate notation and TikZ. Assignment~2 maps business services to technical services and explains how this mapping could be represented in a monitoring dashboard. Assignment~3 designs a solution for status and performance monitoring of all servers. Assignment~7 designs a solution for logging and forensic data collection.
 
 % ============================================================
 \section{Assignment 2 -- Business Service to Technical Service Mapping}
@@ -18,32 +12,15 @@ This chapter addresses four of the seven optional assignments. Assignment~1 (com
 
 \subsection{Service Mapping}
 
-An enterprise monitoring strategy must not only observe infrastructure components in isolation but must express the health of infrastructure in terms that are meaningful to the business. This requires an explicit mapping between business services (as understood by stakeholders) and the technical services and components that realise them.
+An enterprise monitoring strategy must not only observe infrastructure components in isolation but must express the health of infrastructure in terms that are meaningful to the business. \label{tab:service-mapping}This requires an explicit mapping between business services, as understood by stakeholders, and the technical services and components that realise them.
 
-Table~\ref{tab:service-mapping} presents the full service mapping for LogiFlux B.V., tracing each business service through the application layer to the underlying infrastructure components.
+The \textbf{Customer Order Portal} is realised by the Order System Cluster and depends on the full depth of the Eindhoven stack: the Perimeter Firewall, Load Balancer, Web Cluster, IAM/SSO server, Internal Firewall, Order System Cluster itself, MongoDB Cluster, RabbitMQ Cluster, and PostgreSQL Cluster. Because it is customer-facing and revenue-critical, any failure in this chain has direct business impact.
 
-\begin{table}[H]
-\centering
-\begin{tabularx}{\textwidth}{p{3.2cm}p{3.2cm}X}
-\toprule
-\textbf{Business Service} & \textbf{Application Layer} & \textbf{Dependent Infrastructure Components} \\
-\midrule
-Customer Order Portal & Order System Cluster & Perimeter FW, Load Balancer, Web Cluster, IAM/SSO, Internal FW, Order System Cluster, MongoDB Cluster, RabbitMQ Cluster, PostgreSQL Cluster \\
-\midrule
-Goods Storage \& Distribution & Warehouse Cluster (EHV + GRN) & Internal FW, Warehouse Cluster, RabbitMQ Cluster, PostgreSQL Cluster, WAN link (MPLS/VPN), Groningen FW, WMS Node (GRN), PG Read Replica (GRN) \\
-\midrule
-Financial Administration & Accounting Cluster & Internal FW, Accounting Cluster, PostgreSQL Cluster, RabbitMQ Cluster (invoice events) \\
-\midrule
-Salary \& Personnel Administration & HR / Payroll Cluster & Internal FW, HR/Payroll Cluster, PostgreSQL Cluster \\
-\midrule
-Identity and Access Management & IAM / SSO Server & Perimeter FW, IAM/SSO Node, PostgreSQL Cluster (user store) \\
-\midrule
-IT Operations and Management & Monitoring Server, Jump Host & Management VLAN, Monitoring Server, Jump Host, IAM/SSO (admin authentication) \\
-\bottomrule
-\end{tabularx}
-\caption{Business service to technical service mapping}
-\label{tab:service-mapping}
-\end{table}
+\textbf{Goods Storage and Distribution} is delivered across both sites. It depends on the Internal Firewall, Warehouse Cluster, RabbitMQ Cluster, and PostgreSQL Cluster in Eindhoven, as well as the WAN link (MPLS/VPN), the Groningen Perimeter Firewall, the WMS Node in Groningen, and the PostgreSQL Read Replica in Groningen. The WAN link is therefore a shared dependency between this service and the inter-site replication it requires.
+
+\textbf{Financial Administration} relies on the Accounting Cluster, which in turn depends on the Internal Firewall, PostgreSQL Cluster, and the RabbitMQ Cluster for invoice creation events arriving asynchronously from the Order System. \textbf{Salary and Personnel Administration} follows a simpler dependency chain: the Internal Firewall, HR/Payroll Cluster, and PostgreSQL Cluster, with no message broker dependency.
+
+\textbf{Identity and Access Management} is realised by the IAM/SSO server, which sits behind the Perimeter Firewall and uses the PostgreSQL Cluster as its user store. Its position as a shared dependency for every other service makes it uniquely critical: a single IAM failure blocks access to all six business services simultaneously. \textbf{IT Operations and Management} is supported by the Monitoring Server and Jump Host in the Management VLAN, both of which require IAM/SSO authentication for administrative access.
 
 \subsection{Dependency Analysis}
 
@@ -58,39 +35,17 @@ The mapping reveals two critical shared dependencies that affect multiple busine
 
 \subsubsection{Design Principles}
 
-The monitoring dashboard follows three principles derived from the stakeholder analysis:
-
-\begin{itemize}
-    \item \textbf{Business-first view:} The primary dashboard view presents service health in business terms (e.g. ``Customer Order Portal: Operational''), not server metrics. Stakeholders without IT backgrounds (Operations Director, CEO) must be able to interpret the dashboard immediately.
-    \item \textbf{Role-based access:} Different stakeholders see different levels of detail. Business managers see service-level indicators (green/amber/red). IT staff see the underlying component metrics. No role sees data outside their responsibility.
-    \item \textbf{Drill-down capability:} Each business service indicator links to a second-level view showing the contributing technical components. A third level provides raw metrics and logs.
-\end{itemize}
+The monitoring dashboard is shaped by three principles drawn from the stakeholder analysis. The primary view must present service health in business terms --- ``Customer Order Portal: Operational'' rather than server metrics --- so that stakeholders without IT backgrounds, such as the Operations Director and CEO, can interpret it immediately. Role-based access then ensures that different stakeholders see the appropriate level of detail: business managers see service-level indicators, IT staff see the underlying component metrics, and no role sees data outside their responsibility. Finally, drill-down capability means that each business service indicator links to a second-level view of the contributing technical components, and a third level exposes raw metrics and logs for engineering investigation.
 
 \subsubsection{Dashboard Structure}
 
-The dashboard is structured across three tiers:
+The dashboard is structured across three tiers, each addressing a different audience.
 
-\textbf{Tier 1 --- Executive / Business View (read-only, all authenticated users)}
-\begin{itemize}
-    \item Six status tiles, one per business service, showing current operational state: \textcolor{green!60!black}{\textbf{Operational}}, \textcolor{orange}{\textbf{Degraded}} or \textcolor{red}{\textbf{Unavailable}}.
-    \item A 24-hour availability sparkline per service (percentage of time in ``Operational'' state).
-    \item A current incident banner if any P1 or P2 incident is active.
-\end{itemize}
+\textbf{Tier 1 --- Executive / Business View (read-only, all authenticated users)} presents six status tiles, one per business service, each displaying the current operational state as \textcolor{green!60!black}{\textbf{Operational}}, \textcolor{orange}{\textbf{Degraded}}, or \textcolor{red}{\textbf{Unavailable}}. A 24-hour availability sparkline accompanies each tile, showing the percentage of time spent in the Operational state over the preceding day. If any P1 or P2 incident is active, a current incident banner is displayed at the top of the view.
 
-\textbf{Tier 2 --- Operations View (IT staff and relevant department managers)}
-\begin{itemize}
-    \item Per-service component health matrix: each infrastructure component contributing to the service, showing health state, latency and last check timestamp.
-    \item Key performance indicators: Order System request rate and error rate; Warehouse message queue depth; database replication lag.
-    \item WAN link status (MPLS primary / VPN failover) with bandwidth utilisation.
-\end{itemize}
+\textbf{Tier 2 --- Operations View (IT staff and relevant department managers)} provides a per-service component health matrix showing the state, latency, and last check timestamp of each contributing infrastructure component. Key performance indicators are surfaced at this tier: the Order System's request rate and error rate, the Warehouse message queue depth, and database replication lag. WAN link status --- MPLS primary or VPN failover --- is shown with current bandwidth utilisation.
 
-\textbf{Tier 3 --- Engineering View (IT staff only)}
-\begin{itemize}
-    \item Individual server dashboards: CPU, memory, disk I/O, network throughput, process count.
-    \item Database dashboards: query throughput, lock contention, replication lag (seconds), slow query log.
-    \item RabbitMQ dashboards: queue depth per queue, consumer lag, message publish and ack rates.
-    \item Firewall dashboards: connection table utilisation, blocked connection counts, bandwidth per VLAN.
-\end{itemize}
+\textbf{Tier 3 --- Engineering View (IT staff only)} exposes raw infrastructure metrics. Individual server dashboards show CPU, memory, disk I/O, network throughput, and process count. Database dashboards cover query throughput, lock contention, replication lag in seconds, and the slow query log. RabbitMQ dashboards present queue depth per queue, consumer lag, and message publish and acknowledge rates. Firewall dashboards show connection table utilisation, blocked connection counts, and bandwidth per VLAN.
 
 \subsubsection{Tooling Recommendation}
 
@@ -103,26 +58,13 @@ The dashboard is structured across three tiers:
 
 \subsection{Scope and Objectives}
 
-This monitoring solution addresses status and performance monitoring for all server-class infrastructure components in the LogiFlux environment, across both sites. The objectives, derived from the requirements in Chapter~\ref{chapter:requirements}, are:
-
-\begin{itemize}
-    \item Provide real-time visibility into the operational state of all production servers.
-    \item Detect failures and degraded performance before they impact business services.
-    \item Support proactive capacity planning (NFR-CAP-01 through NFR-CAP-04).
-    \item Deliver automated alerting within 2 minutes of a critical failure (MR-02).
-    \item Provide data for SLA reporting (MR-04).
-\end{itemize}
+This monitoring solution addresses status and performance monitoring for all server-class infrastructure components in the LogiFlux environment, across both sites. Derived from the requirements in Chapter~\ref{chapter:requirements}, the solution must provide real-time visibility into the operational state of all production servers and detect failures or degraded performance before they impact business services. It must support proactive capacity planning in line with NFR-CAP-01 through NFR-CAP-04, deliver automated alerting within two minutes of a critical failure as required by MR-02, and provide the availability data needed for monthly SLA reporting as required by MR-04.
 
 \subsection{Architecture}
 
-The monitoring architecture follows an \textbf{agent-based collection model}: a lightweight metrics agent runs on each monitored host and pushes or exposes data to a central Prometheus server in the Management VLAN. This avoids the need to open inbound firewall rules to production servers and reduces the attack surface.
+The monitoring architecture follows an \textbf{agent-based collection model}: a lightweight metrics agent runs on each monitored host and exposes data to a central Prometheus server in the Management VLAN. This avoids the need to open inbound firewall rules to production servers and reduces the overall attack surface.
 
-\begin{itemize}
-    \item \textbf{Metrics collection:} Prometheus with \textbf{node\_exporter} on all Linux hosts and \textbf{windows\_exporter} on all Windows hosts. Additional exporters are deployed per service type (see Table~\ref{tab:exporters}).
-    \item \textbf{Storage:} Prometheus retains 15 days of high-resolution (15-second interval) metrics locally. Data is downsampled and forwarded to \textbf{Thanos} or \textbf{VictoriaMetrics} for the 13-month long-term retention required by MR-06.
-    \item \textbf{Visualisation:} Grafana (as described in Assignment~2) provides dashboards for all tiers of stakeholders.
-    \item \textbf{Alerting:} Prometheus \textbf{Alertmanager} routes alerts by severity to on-call IT staff via PagerDuty (P1/P2) and to a Teams/Slack channel (P3/informational). The 2-minute detection-to-notification requirement (MR-02) is met by a 1-minute scrape interval for critical components and a 1-minute alert evaluation cycle.
-\end{itemize}
+For metrics collection, Prometheus uses \textbf{node\_exporter} on all Linux hosts and \textbf{windows\_exporter} on all Windows hosts, with additional service-specific exporters deployed per component type as detailed in Table~\ref{tab:exporters}. Prometheus retains 15 days of high-resolution metrics locally at a 15-second scrape interval; data is then downsampled and forwarded to \textbf{Thanos} or \textbf{VictoriaMetrics} for the 13-month long-term retention required by MR-06. Grafana, as described in Assignment~2, provides dashboards for all three stakeholder tiers. Alerting is handled by Prometheus \textbf{Alertmanager}, which routes alerts by severity: P1 and P2 alerts reach on-call IT staff via PagerDuty, while P3 and informational alerts are published to a Teams or Slack channel. The two-minute detection-to-notification requirement from MR-02 is met by a one-minute scrape interval on critical components combined with a one-minute alert evaluation cycle.
 
 \begin{table}[H]
 \centering
@@ -202,41 +144,17 @@ A centralised logging and forensic readiness solution serves three distinct purp
 
 \subsection{Log Sources}
 
-Table~\ref{tab:log-sources} enumerates all log sources in the LogiFlux environment and their classification.
+\label{tab:log-sources}The LogiFlux environment generates log data from twelve distinct sources, grouped here by category.
 
-\begin{table}[H]
-\centering
-\begin{tabularx}{\textwidth}{p{3.5cm}lX}
-\toprule
-\textbf{Source} & \textbf{Category} & \textbf{Log Types and Content} \\
-\midrule
-Perimeter Firewalls (EHV, GRN) & Security / Network & Connection allowed/denied, NAT translations, IDS/IPS alerts, interface state changes \\
-Internal Firewall (EHV) & Security / Network & Inter-VLAN traffic decisions, policy violation events \\
-Load Balancer & Operational & HTTP access log (method, URI, response code, client IP, response time), backend health check results \\
-Web Cluster & Operational & Application access logs, HTTP error logs, SSL handshake errors \\
-IAM / SSO Server & Security / Compliance & Authentication events (success/failure), MFA events, session creation/destruction, role assignment changes \\
-Application Clusters (all four) & Operational / Compliance & Application error logs, user action audit logs (for Accounting and HR), inter-service API call logs \\
-RabbitMQ Cluster & Operational & Message publish/consume/ack/nack events, queue creation/deletion, consumer connect/disconnect \\
-PostgreSQL Cluster & Compliance & Query logs (DDL always; DML on sensitive tables), connection logs, authentication failures, vacuum/checkpoint events \\
-MongoDB Cluster & Operational & Slow query log ($>$100 ms), authentication events, replication events \\
-Jump Host & Security / Forensic & Full session recording (keystroke + timing logs for all administrative sessions via Teleport or similar), command history \\
-Monitoring Server & Operational & Prometheus scrape errors, Alertmanager notification deliveries and failures \\
-Windows Endpoints (EHV, GRN) & Security & Windows Security Event Log (logon/logoff, privilege use, process creation --- Event IDs 4624, 4625, 4648, 4688, 4697) \\
-\bottomrule
-\end{tabularx}
-\caption{Log sources, categories and content}
-\label{tab:log-sources}
-\end{table}
+Security and network logs originate from the perimeter firewalls at both Eindhoven and Groningen --- capturing connection allow/deny decisions, NAT translations, IDS/IPS alerts, and interface state changes --- and from the internal firewall at Eindhoven, which records inter-VLAN traffic decisions and policy violation events. The IAM/SSO server is also a critical security log source, producing authentication events (success and failure), MFA events, session creation and destruction records, and role assignment changes. Windows endpoints at both sites contribute Windows Security Event Log entries covering logon/logoff, privilege use, and process creation (Event IDs 4624, 4625, 4648, 4688, and 4697). The jump host generates the most forensically significant logs: full session recordings capturing keystrokes and timing for all administrative sessions via Teleport or equivalent, alongside command history.
+
+Operational logs come from the load balancer (HTTP access log including method, URI, response code, client IP, and response time, plus backend health check results), the web cluster (application access logs, HTTP error logs, and SSL handshake errors), the RabbitMQ cluster (message publish, consume, ack, and nack events; queue creation and deletion; consumer connect and disconnect), MongoDB (slow query log for queries exceeding 100~ms, authentication events, and replication events), and the monitoring server itself (Prometheus scrape errors and Alertmanager notification delivery and failure records).
+
+Compliance logs are generated by the application clusters --- all four produce application error logs and inter-service API call logs, while the Accounting and HR clusters additionally produce user action audit logs attributing each operation to a named identity --- and by PostgreSQL, which logs all DDL operations, DML operations on sensitive tables, connection events, authentication failures, and vacuum/checkpoint events.
 
 \subsection{Centralised Log Architecture}
 
-All log sources forward data to a centralised log management platform running on the monitoring server in the Management VLAN. The recommended stack is:
-
-\begin{itemize}
-    \item \textbf{Fluent Bit} (lightweight forwarder): runs as a daemon on all hosts; collects, parses and forwards logs over TLS to the central aggregator. Fluent Bit is chosen over Filebeat for its lower resource footprint (relevant on the WMS node at Groningen).
-    \item \textbf{Loki} (log aggregation): stores logs indexed by labels (host, service, VLAN, site). Loki's label-based indexing model is highly efficient for the LogiFlux log volume and integrates natively with Grafana for unified log and metrics exploration.
-    \item \textbf{Grafana} (log query UI): IT staff query logs using Grafana's Explore interface with LogQL, the same platform used for performance dashboards (Assignment~2). This avoids deploying a separate UI for logs.
-\end{itemize}
+All log sources forward data to a centralised log management platform running on the monitoring server in the Management VLAN. \textbf{Fluent Bit} serves as the lightweight forwarder, running as a daemon on all hosts; it collects, parses, and forwards logs over TLS to the central aggregator. Fluent Bit is chosen over Filebeat for its lower resource footprint, which is particularly relevant on the resource-constrained WMS node at Groningen. \textbf{Loki} handles log aggregation, storing logs indexed by labels (host, service, VLAN, and site); its label-based indexing model is highly efficient for the LogiFlux log volume and integrates natively with Grafana for unified log and metrics exploration. IT staff query logs using \textbf{Grafana}'s Explore interface with LogQL --- the same platform used for performance dashboards in Assignment~2 --- avoiding the need to deploy a separate UI for logs.
 
 For long-term cold storage (compliance retention beyond 30 days), Loki is configured with an \textbf{S3-compatible object storage backend} (on-premises MinIO instance or a compliant cloud bucket). This separates hot operational logs (fast SSD storage, 30-day retention) from cold compliance logs (object storage, 7-year retention for financial audit logs, 36-month retention for security logs per NFR-SEC-05).
 
@@ -292,11 +210,4 @@ The logging information flow is as follows:
 
 \subsection{GDPR Considerations}
 
-Centralised logging inevitably involves processing personal data (usernames, IP addresses, potentially employee activity records). The following GDPR-aligned controls are applied:
-
-\begin{itemize}
-    \item Log data is \textbf{pseudonymised} where possible: internal user identifiers replace full names in non-audit logs.
-    \item Access to logs containing personal data (HR audit logs, employee endpoint logs) is restricted to the IT Director and HR Manager by Grafana RBAC policy.
-    \item A \textbf{Data Processing Register} entry is maintained for the logging system, documenting data categories, retention periods and access controls.
-    \item Logs are stored \textbf{within the EU} (on-premises in the Netherlands; any cloud object storage uses an EU region).
-\end{itemize}
+Centralised logging inevitably involves processing personal data (usernames, IP addresses, potentially employee activity records). Log data is pseudonymised where possible, with internal user identifiers replacing full names in non-audit logs. Access to logs containing personal data --- HR audit logs and employee endpoint logs --- is restricted to the IT Director and HR Manager through Grafana's RBAC policy. A \textbf{Data Processing Register} entry is maintained for the logging system, documenting data categories, retention periods, and access controls as required by GDPR Article~30. All logs are stored within the EU, on-premises in the Netherlands, with any cloud object storage restricted to an EU region.
