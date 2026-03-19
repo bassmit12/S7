@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.7)  19 MAR 2026 22:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.7)  20 MAR 2026 00:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1327,7 +1327,7 @@ File: fc-english.def 2016/01/12
 brarypositioning.code.tex
 File: tikzlibrarypositioning.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-<figures/Report_Cover_Image.jpg, id=183, 4039.09pt x 6070.68pt>
+<figures/Report_Cover_Image.jpg, id=179, 4039.09pt x 6070.68pt>
 File: figures/Report_Cover_Image.jpg Graphic file (type jpg)
 <use figures/Report_Cover_Image.jpg>
 Package pdftex.def Info: figures/Report_Cover_Image.jpg  used on input line 36.
@@ -1344,7 +1344,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `RobotoSlab-TLF' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-<figures/fontys_logo_white.png, id=184, 578.16pt x 253.69781pt>
+<figures/fontys_logo_white.png, id=180, 578.16pt x 253.69781pt>
 File: figures/fontys_logo_white.png Graphic file (type png)
 <use figures/fontys_logo_white.png>
 Package pdftex.def Info: figures/fontys_logo_white.png  used on input line 36.
@@ -1465,25 +1465,25 @@ LaTeX Font Info:    Font shape `TS1/zpltlf/m/n' will be
 {c:/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/zpl_TOsF.enc}])
 (./mainmatter/research-questions.tex [2]
 Chapter 2.
-[3
+) (./mainmatter/methodology.tex [3
 
-]) (./mainmatter/methodology.tex [4]
+]
 Chapter 3.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
 (Font)              scaled to size 12.0pt on input line 10.
 LaTeX Font Info:    Font shape `T1/RobotoSlab-TLF/b/n' aliased to
 (Font)              `T1/RobotoSlab-TLF/bold/n' on input line 10.
-[5
+[4
 
-] [6{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc}]
+] [5{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc}]
 LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
-(Font)              scaled to size 8.0pt on input line 108.
- [7])
-(./mainmatter/requirements.tex [8]
+(Font)              scaled to size 8.0pt on input line 106.
+ [6])
+(./mainmatter/requirements.tex [7]
 Chapter 4.
-[9
+[8
 
-]) (./mainmatter/planning.tex [10]
+]) (./mainmatter/planning.tex [9]
 Chapter 5.
 
 Underfull \hbox (badness 7064) in paragraph at lines 23--24
@@ -1501,8 +1501,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 24--25
  []
 
 
-Underfull \hbox (badness 3884) in paragraph at lines 28--29
-\T1/zpltlf/m/n/10 (+20) clus-ter; do-main mod-elling;
+Underfull \hbox (badness 4072) in paragraph at lines 28--29
+[]|\T1/zpltlf/m/n/10 (+20) Problem anal-y-sis on ref-er-
  []
 
 
@@ -1518,6 +1518,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 33--34
 
 Underfull \hbox (badness 10000) in paragraph at lines 33--34
 \T1/zpltlf/m/n/10 (+20) deny); en-able Wire-Guard
+ []
+
+
+Underfull \hbox (badness 1360) in paragraph at lines 33--34
+\T1/zpltlf/m/n/10 (+20) and UI; val-i-date Layer 3--7
  []
 
 
@@ -1545,28 +1550,28 @@ Underfull \hbox (badness 2600) in paragraph at lines 49--50
 []|\T1/zpltlf/m/n/10 (+20) Test & bench-
  []
 
-[11
+[10
 
 ]
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
 (Font)              scaled to size 5.5pt on input line 64.
- [12{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
-[13]) [14] (./report.aux)
+ [11{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
+[12]) [13] (./report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2020/03/25>
  ***********
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: AC66A93CAC9A499F4849AD0D2F5453EB;7111.
+(rerunfilecheck)             Checksum: 66EF95E5621DD43D8F6040AB89D77213;6968.
  ) 
 Here is how much of TeX's memory you used:
- 38910 strings out of 467538
- 753517 string characters out of 5423725
- 1138925 words of memory out of 5000000
- 66956 multiletter control sequences out of 15000+600000
- 765296 words of font info for 208 fonts, out of 8000000 for 9000
+ 38923 strings out of 467538
+ 753800 string characters out of 5423725
+ 1138923 words of memory out of 5000000
+ 66955 multiletter control sequences out of 15000+600000
+ 766153 words of font info for 216 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,12n,108p,1195b,1240s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,11n,108p,1195b,1198s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Bold.pfb><c:
 /texlive/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Light.pfb><c:/tex
 live/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Thin.pfb><c:/texlive/
@@ -1575,10 +1580,10 @@ live/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Thin.pfb><c:/texlive/
 lic/txfonts/t1xtt.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/newpx/zplb
 .pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/newpx/zplr.pfb><c:/texlive/
 2025/texmf-dist/fonts/type1/public/newpx/zplri.pfb>
-Output written on report.pdf (16 pages, 2524172 bytes).
+Output written on report.pdf (15 pages, 2520461 bytes).
 PDF statistics:
- 414 PDF objects out of 1000 (max. 8388607)
- 364 compressed objects within 4 object streams
- 83 named destinations out of 1000 (max. 500000)
- 41335 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 405 PDF objects out of 1000 (max. 8388607)
+ 356 compressed objects within 4 object streams
+ 81 named destinations out of 1000 (max. 500000)
+ 41327 words of extra memory for PDF output out of 42996 (max. 10000000)
 

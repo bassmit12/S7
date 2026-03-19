@@ -3,30 +3,30 @@
 
 \section{Background and Motivation}
 
-Enterprise infrastructure has grown substantially more complex over the last decade. Kubernetes has become the de-facto standard for container orchestration, but its adoption introduces two interrelated and persistent challenges: \emph{reactive monitoring} and \emph{insufficient network security visibility}.
+Enterprise infrastructure has become way more complex over the past decade. Kubernetes is now the go-to solution for running containers, but using it brings two ongoing challenges: \emph{reactive monitoring} and \emph{poor visibility into network security}.
 
-Traditional threshold-based monitoring systems are designed for static, predictable workloads. In a dynamic Kubernetes environment — where pods are ephemeral, traffic patterns shift continuously, and dozens of microservices interact — fixed alert thresholds produce excessive false positives and frequently miss subtle, multi-dimensional anomalies that precede real outages. The result is alert fatigue for on-call engineers and a fundamentally \emph{reactive} posture: problems are discovered only after they have already impacted services.
+Traditional monitoring systems rely on fixed thresholds. They're built for static, predictable workloads. But Kubernetes is anything but static — pods come and go constantly, traffic patterns change all the time, and dozens of microservices talk to each other. Fixed thresholds lead to tons of false alarms and often miss subtle issues that actually matter. Engineers get overwhelmed with alerts (alert fatigue), and problems only get noticed \emph{after} they've already affected users. It's a reactive approach, not a proactive one.
 
-On the security side, the default Kubernetes networking model relies on \texttt{iptables} rules managed by \texttt{kube-proxy}. This approach operates exclusively at Layer~3/4 (IP and port), has limited observability, and becomes a performance bottleneck at scale. It offers no visibility into the content or identity of application-layer traffic and provides no mechanism for detecting lateral movement or anomalous flow behaviour within the cluster.
+On the security side, Kubernetes networking by default uses \texttt{iptables} rules managed by \texttt{kube-proxy}. This only works at Layer~3/4 (IP addresses and ports), gives you limited insight into what's actually happening, and becomes a bottleneck when you scale up. You can't see application-level traffic details, and you have no way to detect suspicious activity like lateral movement inside your cluster.
 
-Cilium\footnote{\url{https://cilium.io}} addresses these networking limitations through the use of eBPF (extended Berkeley Packet Filter) --- a kernel-level technology that allows safe, sandboxed programs to run inside the Linux kernel without modifying kernel source code. Cilium enforces network policies at Layer~3 through Layer~7 (including HTTP, gRPC, and Kafka), provides mutual TLS encryption between workloads, and exposes rich, real-time network flow telemetry through its Hubble observability layer.
+Cilium\footnote{\url{https://cilium.io}} fixes these networking problems by using eBPF (extended Berkeley Packet Filter) — a technology that lets you run safe programs inside the Linux kernel without changing the kernel itself. Cilium can enforce network policies from Layer~3 all the way up to Layer~7 (including HTTP, gRPC, and Kafka). It encrypts traffic between workloads with mutual TLS and provides detailed, real-time network flow data through its Hubble observability component.
 
-Critically, the combination of AI-driven monitoring and Cilium-based network security is deeply complementary. Cilium's Hubble component generates granular per-flow telemetry that can serve as a high-value input to machine-learning anomaly detection models. Conversely, AI-detected anomalies in infrastructure metrics can trigger dynamic responses at the network layer. Together these technologies enable an infrastructure that is \emph{self-aware} and \emph{self-defending}: capable of detecting emerging problems proactively and responding to threats autonomously.
+Here's the key insight: combining AI-driven monitoring with Cilium's network security creates something powerful. Cilium's Hubble generates detailed per-flow data that's perfect for training machine learning models to detect anomalies. At the same time, when AI detects something unusual in your infrastructure metrics, it can trigger automated responses at the network layer. Together, you get infrastructure that's \emph{self-aware} and \emph{self-defending} — it spots problems early and responds to threats automatically.
 
 \section{Project Scope}
 
-This project investigates how an AI-powered monitoring system and a Cilium-secured Kubernetes network can be designed, integrated, and validated to provide proactive, automated infrastructure management in an enterprise context.
+This project explores how to design, build, and test an integrated system that combines AI-powered monitoring with Cilium-secured Kubernetes networking to enable proactive, automated infrastructure management.
 
-The scope covers:
+What we'll cover:
 \begin{itemize}
-    \item A study of current Kubernetes monitoring and networking limitations.
-    \item The design of an integrated architecture combining Prometheus, an AI anomaly detection engine, Cilium, and Hubble.
-    \item A proof-of-concept implementation deployed on a bare-metal Kubernetes cluster.
-    \item Empirical evaluation of the solution's effectiveness and performance overhead.
+    \item Understanding the current limitations of Kubernetes monitoring and networking
+    \item Designing an integrated architecture using Prometheus, an AI anomaly detection engine, Cilium, and Hubble
+    \item Building a proof-of-concept on a bare-metal Kubernetes cluster
+    \item Testing how well it works and measuring the performance impact
 \end{itemize}
 
 \section{Relevance to Enterprise Infrastructure}
 
-Enterprise infrastructure teams are under growing pressure to maintain service reliability while managing increasingly complex, distributed systems. Proactive anomaly detection reduces mean-time-to-detect (MTTD) and mean-time-to-resolve (MTTR) for incidents, directly translating to higher service availability. The shift to zero-trust networking — mandated by frameworks such as NIST SP~800-207 and increasingly required by enterprise security policies — demands the kind of identity-aware, application-layer network policy enforcement that Cilium provides.
+Infrastructure teams are dealing with growing pressure: keep services running reliably while managing increasingly complex, distributed systems. Proactive anomaly detection helps you find and fix problems faster (reducing MTTD and MTTR), which means better uptime. Meanwhile, the shift to zero-trust networking — required by frameworks like NIST SP~800-207 and many enterprise security policies — needs the kind of identity-aware, application-level network controls that Cilium provides.
 
-By combining these two capabilities, this project addresses a genuine gap in the current enterprise tooling landscape and produces a reusable, open-source-based blueprint that infrastructure teams can adopt.
+By combining these capabilities, this project fills a real gap in today's enterprise tooling. The result is a practical, open-source-based approach that infrastructure teams can actually use.

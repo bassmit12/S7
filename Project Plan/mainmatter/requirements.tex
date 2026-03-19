@@ -1,56 +1,56 @@
-\chapter{Non-Functional Requirements}
+\chapter{Non-Functional Requirements}
 \label{chapter:requirements}
 
-The following non-functional requirements (NFRs) constrain the design and implementation of the integrated solution. They are derived from enterprise infrastructure best practices, the reviewed standards (CIS Kubernetes Benchmark, NIST SP~800-207), and the project context.
+The following non-functional requirements (NFRs) define constraints on how the integrated solution should perform and behave. They're based on enterprise infrastructure best practices, industry standards (CIS Kubernetes Benchmark, NIST SP~800-207), and the project context.
 
 \section{Scalability}
 
 \begin{itemize}
-    \item \textbf{NFR-SC-01:} The monitoring stack must remain operational and responsive on clusters of up to 100 worker nodes and 500 running pods without manual reconfiguration.
-    \item \textbf{NFR-SC-02:} The AI inference pipeline must scale horizontally; throughput must increase linearly when additional inference replicas are added.
-    \item \textbf{NFR-SC-03:} Cilium must operate at wire speed on 10~Gbps network interfaces without packet drops under normal cluster load.
+    \item \textbf{NFR-SC-01:} The monitoring stack must work smoothly on clusters with up to 100 worker nodes and 500 running pods without needing manual reconfiguration.
+    \item \textbf{NFR-SC-02:} The AI inference pipeline must scale horizontally — throughput should increase linearly when we add more inference replicas.
+    \item \textbf{NFR-SC-03:} Cilium must operate at wire speed on 10~Gbps network interfaces without dropping packets under normal cluster load.
 \end{itemize}
 
 \section{Performance}
 
 \begin{itemize}
-    \item \textbf{NFR-PE-01:} The additional CPU overhead introduced by Cilium (eBPF programs) must not exceed 5\% of total cluster CPU capacity compared to a Flannel baseline under equivalent workloads.
-    \item \textbf{NFR-PE-02:} The additional memory footprint of the Cilium agent must not exceed 200~MiB per node.
-    \item \textbf{NFR-PE-03:} The end-to-end monitoring latency (metric generation to alert notification) must be below 60 seconds for critical severity alerts.
+    \item \textbf{NFR-PE-01:} The extra CPU overhead from Cilium (eBPF programs) must not exceed 5\% of total cluster CPU capacity compared to a Flannel baseline under the same workloads.
+    \item \textbf{NFR-PE-02:} The extra memory footprint of the Cilium agent must not exceed 200~MiB per node.
+    \item \textbf{NFR-PE-03:} End-to-end monitoring latency (from when a metric is generated to when an alert is sent) must be under 60 seconds for critical severity alerts.
     \item \textbf{NFR-PE-04:} AI model inference latency for a single prediction must be below 500~ms at the 99th percentile.
 \end{itemize}
 
 \section{Security}
 
 \begin{itemize}
-    \item \textbf{NFR-SE-01:} All inter-service communication within the cluster must be governed by explicit CiliumNetworkPolicy resources; a default-deny posture must be enforced at both ingress and egress.
-    \item \textbf{NFR-SE-02:} Mutual TLS (mTLS) must be enforced transparently between all workloads using Cilium's WireGuard or IPsec encryption, without requiring application code changes.
-    \item \textbf{NFR-SE-03:} The solution must achieve a passing score on the applicable controls of the CIS Kubernetes Benchmark~v1.9.
-    \item \textbf{NFR-SE-04:} All container images used in the monitoring and security stack must be scanned for known CVEs prior to deployment; images with critical vulnerabilities must not be deployed.
-    \item \textbf{NFR-SE-05:} Secrets (API keys, certificates, credentials) must not be stored in plaintext; they must be managed via Kubernetes Secrets with RBAC access controls or an external secrets manager.
+    \item \textbf{NFR-SE-01:} All communication between services in the cluster must be controlled by explicit CiliumNetworkPolicy resources. We'll enforce a default-deny approach for both incoming and outgoing traffic.
+    \item \textbf{NFR-SE-02:} Mutual TLS (mTLS) must be automatically enforced between all workloads using Cilium's WireGuard or IPsec encryption, without requiring any application code changes.
+    \item \textbf{NFR-SE-03:} The solution must pass the applicable controls of the CIS Kubernetes Benchmark~v1.9.
+    \item \textbf{NFR-SE-04:} All container images used in the monitoring and security stack must be scanned for known vulnerabilities before deployment. We won't deploy images with critical CVEs.
+    \item \textbf{NFR-SE-05:} Secrets (API keys, certificates, credentials) must not be stored in plaintext. They'll be managed via Kubernetes Secrets with RBAC access controls or an external secrets manager.
 \end{itemize}
 
 \section{Reliability}
 
 \begin{itemize}
-    \item \textbf{NFR-RE-01:} The monitoring stack (Prometheus, Grafana, AlertManager) must be deployed in high-availability mode with a minimum of two replicas per component and anti-affinity rules to prevent co-location on the same node.
-    \item \textbf{NFR-RE-02:} Metric data retention must be a minimum of 30 days, with long-term storage backed by persistent volumes.
-    \item \textbf{NFR-RE-03:} The Cilium agent must recover automatically from pod restarts without manual intervention, re-establishing all enforced network policies within 30 seconds.
-    \item \textbf{NFR-RE-04:} The AI anomaly detection service must be resilient to the loss of a single input data stream; it must continue to produce predictions using available data and emit a degraded-mode alert.
+    \item \textbf{NFR-RE-01:} The monitoring stack (Prometheus, Grafana, AlertManager) must be deployed in high-availability mode with at least two replicas per component and anti-affinity rules to prevent them from running on the same node.
+    \item \textbf{NFR-RE-02:} We'll retain metric data for at least 30 days, with long-term storage backed by persistent volumes.
+    \item \textbf{NFR-RE-03:} The Cilium agent must recover automatically from pod restarts without manual intervention, re-establishing all network policies within 30 seconds.
+    \item \textbf{NFR-RE-04:} The AI anomaly detection service must be resilient to losing a single input data stream. It should keep producing predictions using available data and send a degraded-mode alert.
 \end{itemize}
 
 \section{Observability}
 
 \begin{itemize}
-    \item \textbf{NFR-OB-01:} Full L3--L7 network flow visibility must be provided via Hubble for all intra-cluster and cluster-egress traffic.
-    \item \textbf{NFR-OB-02:} The solution must support the three pillars of observability: metrics (Prometheus), logs (Loki), and distributed traces (OpenTelemetry/Jaeger), with correlation across all three signals.
-    \item \textbf{NFR-OB-03:} Grafana dashboards must provide at minimum: cluster-level resource utilisation, per-namespace network flow heatmaps, anomaly detection score time series, and active network policy violation counts.
+    \item \textbf{NFR-OB-01:} Full Layer~3 through Layer~7 network flow visibility must be available via Hubble for all traffic within the cluster and going out of the cluster.
+    \item \textbf{NFR-OB-02:} The solution must support the three pillars of observability: metrics (Prometheus), logs (Loki), and distributed traces (OpenTelemetry/Jaeger), with the ability to correlate across all three.
+    \item \textbf{NFR-OB-03:} Grafana dashboards must provide at minimum: cluster-level resource usage, per-namespace network flow heatmaps, anomaly detection score time series, and counts of active network policy violations.
 \end{itemize}
 
 \section{Maintainability and Portability}
 
 \begin{itemize}
-    \item \textbf{NFR-MA-01:} All components must be deployed exclusively via Helm charts stored in a version-controlled Git repository; no manual \texttt{kubectl apply} steps should be required after initial cluster bootstrap.
-    \item \textbf{NFR-MA-02:} The GitOps reconciliation loop (Flux CD) must automatically converge the cluster state to the desired state defined in Git within 5 minutes of a commit.
-    \item \textbf{NFR-MA-03:} The solution must be validated on at least two distinct Kubernetes distributions: bare-metal (kubeadm) and a managed cloud service (AKS or EKS).
+    \item \textbf{NFR-MA-01:} All components must be deployed exclusively via Helm charts stored in a version-controlled Git repository. No manual \texttt{kubectl apply} steps should be needed after initial cluster setup.
+    \item \textbf{NFR-MA-02:} The GitOps reconciliation loop (Flux CD) must automatically bring the cluster to the desired state defined in Git within 5 minutes of a commit.
+    \item \textbf{NFR-MA-03:} The solution must be validated on at least two different Kubernetes distributions: bare-metal (kubeadm) and a managed cloud service (AKS or EKS).
 \end{itemize}

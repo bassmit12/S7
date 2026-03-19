@@ -3,7 +3,7 @@
 
 \section{Project Timeline}
 
-The remaining project period runs from 12 March 2026 to 28 June 2026. Working two days per week (09:00--16:00), this yields approximately 15 working weeks. Table~\ref{tab:timeline} maps each phase to a concrete date range.
+The remaining project period runs from 12 March 2026 to 28 June 2026. Working two days per week (09:00--16:00), this gives us roughly 15 working weeks. Table~\ref{tab:timeline} breaks down each phase with concrete date ranges.
 
 \begin{table}[H]
 \centering
@@ -15,7 +15,7 @@ The remaining project period runs from 12 March 2026 to 28 June 2026. Working tw
 \midrule
 Project Plan
     & 12 Mar
-    & Finalise and submit plan of approach; supervisor review and approval
+    & Finalize and submit plan of approach; supervisor review and approval
     & \textbf{This document} \\
 \midrule
 Library Research
@@ -25,12 +25,12 @@ Library Research
 \midrule
 Architecture Design
     & 2 Apr -- 16 Apr
-    & Problem analysis on reference cluster; domain modelling; ArchiMate architecture views (TOGAF ADM phases A--C)
+    & Problem analysis on reference cluster; domain modeling; ArchiMate architecture views (TOGAF ADM phases A--C)
     & Architecture document \\
 \midrule
 Implementation --- Cilium
     & 16 Apr -- 7 May
-    & Install Cilium; configure CiliumNetworkPolicy (default-deny); enable WireGuard mTLS; deploy Hubble Relay and UI; validate L3--L7 policy enforcement
+    & Install Cilium; configure CiliumNetworkPolicy (default-deny); enable WireGuard mTLS; deploy Hubble Relay and UI; validate Layer~3--7 policy enforcement
     & Cilium PoC \\
 \midrule
 Implementation --- AI Monitoring
@@ -91,7 +91,7 @@ Buffer / contingency      & 2  & 14 \\
 
 \section{Expected Deliverables}
 
-The following artefacts will be produced over the course of the project:
+We'll produce the following artifacts over the course of the project:
 
 \begin{enumerate}
     \item \textbf{Project Plan} (12 March) --- this document.
@@ -106,23 +106,23 @@ The following artefacts will be produced over the course of the project:
 
 \subsection{Training Data for AI Anomaly Detection}
 
-Training an unsupervised anomaly detection model requires a representative baseline of normal infrastructure behaviour. Generating this baseline on a freshly provisioned test cluster means the model must be trained on synthetic or simulated workloads, which may not fully reflect the diversity of production traffic patterns. Mitigation: use an unsupervised technique (Isolation Forest) for the initial model, which does not require labelled anomaly data; supplement with synthetic anomaly injection for evaluation.
+Training an unsupervised anomaly detection model requires a representative baseline of normal infrastructure behavior. Generating this baseline on a freshly set up test cluster means we'll have to train the model on synthetic or simulated workloads, which might not fully capture the diversity of production traffic patterns. Mitigation: we'll use an unsupervised technique (Isolation Forest) for the initial model, which doesn't need labeled anomaly data. We'll supplement it with synthetic anomaly injection for evaluation.
 
 \subsection{eBPF Kernel Version Compatibility}
 
-Certain Cilium features (e.g.\ WireGuard transparent encryption, socket-level load balancing) require a minimum Linux kernel version (5.10+). Bare-metal hardware running older kernels may not support all planned features. Mitigation: validate kernel version requirements early during the Cilium implementation phase (from 16 April); document any feature gaps and use alternative mechanisms (IPsec) where WireGuard is unavailable.
+Some Cilium features (like WireGuard transparent encryption and socket-level load balancing) need a minimum Linux kernel version (5.10+). Bare-metal hardware running older kernels might not support all the features we're planning to use. Mitigation: we'll check kernel version requirements early during the Cilium implementation phase (starting 16 April). We'll document any feature gaps and use alternative mechanisms (IPsec) where WireGuard isn't available.
 
 \subsection{Integration Complexity}
 
-Correlating heterogeneous telemetry streams — Prometheus counter metrics, Loki log entries, OpenTelemetry spans, and Hubble flow records — into a unified feature vector for machine learning is non-trivial. Each data source has different cardinality, granularity, and latency characteristics. Mitigation: use the OpenTelemetry Collector as a central pipeline with explicit fan-in transformation; define a minimal feature set for the initial model and expand iteratively.
+Bringing together different telemetry streams — Prometheus counter metrics, Loki log entries, OpenTelemetry spans, and Hubble flow records — into a unified feature vector for machine learning is tricky. Each data source has different cardinality, granularity, and latency characteristics. Mitigation: we'll use the OpenTelemetry Collector as a central pipeline with explicit transformation. We'll define a minimal feature set for the initial model and expand it iteratively.
 
 \subsection{Scope Creep}
 
-The combination of AI/ML and advanced networking touches a broad technology surface. There is a risk of spending too much time on peripheral concerns (e.g.\ model hyper-parameter tuning, advanced Cilium enterprise features) at the expense of completing the core research. Mitigation: strictly follow the timeline; use timeboxing for each implementation sprint; discuss scope changes with the supervisor before acting on them.
+The combination of AI/ML and advanced networking covers a lot of ground. There's a risk of spending too much time on peripheral concerns (like model hyperparameter tuning or advanced Cilium enterprise features) instead of completing the core research. Mitigation: we'll strictly follow the timeline, use timeboxing for each implementation sprint, and discuss any scope changes with the supervisor before acting on them.
 
 \section{Supervisor Approval}
 
-This plan of approach requires review and written approval by the supervising lecturer before research activities commence on 19 March 2026.
+This plan of approach needs to be reviewed and approved in writing by the supervising lecturer before research activities start on 19 March 2026.
 
 \vspace{1cm}
 \begin{tabular}{@{}p{6cm}p{6cm}@{}}

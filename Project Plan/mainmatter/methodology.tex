@@ -1,32 +1,32 @@
 \chapter{Methodology and Research Framework}
 \label{chapter:methodology}
 
-This project applies the \emph{Development Oriented Triangulation} (DOT) framework\footnote{\url{https://ictresearchmethods.nl/dot-framework/}} to structure the research. The DOT framework distinguishes three research levels: \emph{what} is researched (domains), \emph{why} it is researched (trade-offs between fit, expertise, overview, and certainty), and \emph{how} it is researched (strategies and methods). The sections below map each research strategy to the specific methods and activities carried out in this project.
+This project uses the \emph{Development Oriented Triangulation} (DOT) framework\footnote{\url{https://ictresearchmethods.nl/dot-framework/}} to structure our research. The DOT framework breaks things down into three levels: \emph{what} we're researching (domains), \emph{why} we're researching it (balancing fit, expertise, overview, and certainty), and \emph{how} we're researching it (strategies and methods). Below, we'll map out which research strategies and methods we'll use for each part of the project.
 
 \section{Library Research}
 
-Library research explores what is already known and what tools, theories, and guidelines can inform the project. It primarily targets the \emph{available work} domain and optimises for \emph{expertise}.
+Library research explores what's already known and what tools, theories, and guidelines can help us. It mainly looks at the \emph{available work} domain and focuses on building \emph{expertise}.
 
 \subsection{Literature Study}
-A systematic literature study will be conducted covering:
+We'll conduct a systematic literature study covering:
 \begin{itemize}
-    \item AI/ML methods for time-series anomaly detection (Isolation Forest, LSTM autoencoders, Prophet, ARIMA, and transformer-based approaches).
-    \item eBPF internals, the Cilium architecture, and the Hubble observability layer.
-    \item Zero-trust network models (NIST SP~800-207) and their application to Kubernetes.
-    \item The CNCF landscape for observability and security tooling.
+    \item AI/ML methods for time-series anomaly detection (Isolation Forest, LSTM autoencoders, Prophet, ARIMA, and transformer-based approaches)
+    \item eBPF internals, the Cilium architecture, and the Hubble observability layer
+    \item Zero-trust network models (NIST SP~800-207) and how they apply to Kubernetes
+    \item The CNCF landscape for observability and security tooling
 \end{itemize}
 This method primarily answers sub-questions~1, 2, and~3.
 
 \subsection{Available Product Analysis}
-A comparative analysis of existing tools will be performed across two categories:
+We'll do a comparative analysis of existing tools in two categories:
 \begin{itemize}
-    \item \textbf{Monitoring stack:} Prometheus, VictoriaMetrics, Grafana, Loki, OpenTelemetry Collector, Jaeger, and commercial alternatives (Datadog, Dynatrace, New Relic).
-    \item \textbf{Security and networking:} Cilium, Calico, Flannel, Falco, Tetragon, and Hubble.
+    \item \textbf{Monitoring stack:} Prometheus, VictoriaMetrics, Grafana, Loki, OpenTelemetry Collector, Jaeger, and commercial alternatives (Datadog, Dynatrace, New Relic)
+    \item \textbf{Security and networking:} Cilium, Calico, Flannel, Falco, Tetragon, and Hubble
 \end{itemize}
-Each tool is assessed on criteria including open-source licence, Kubernetes-native support, community maturity, feature coverage, and integration feasibility.
+We'll assess each tool based on open-source license, how well it works with Kubernetes, community maturity, feature coverage, and how easy it is to integrate.
 
 \subsection{Best, Good, and Bad Practices}
-The following industry standards and guidelines will be reviewed:
+We'll review these industry standards and guidelines:
 \begin{itemize}
     \item CIS Kubernetes Benchmark (v1.9)
     \item CNCF Cloud Native Security Whitepaper
@@ -34,74 +34,72 @@ The following industry standards and guidelines will be reviewed:
     \item OWASP Kubernetes Security Cheat Sheet
 \end{itemize}
 
+\subsection{IT Architecture Sketching}
+Using ArchiMate~3.2 notation, we'll produce architecture views based on the ArchiMate 3.2 specification, TOGAF ADM documentation, and reference architectures from CNCF projects:
+\begin{itemize}
+    \item \textbf{Motivation view:} Goals, requirements, and constraints
+    \item \textbf{Application layer view:} Monitoring components and their data flows
+    \item \textbf{Technology layer view:} Kubernetes objects, Cilium, and the AI inference pipeline
+    \item \textbf{Implementation and migration view:} Deployment phases
+\end{itemize}
+This method uses documented architectural patterns and standards from available work, addressing sub-question~4.
+
 \section{Field Research}
 
-Field research explores the \emph{application domain} and optimises for \emph{fit} between the solution and its operational context.
+Field research explores the \emph{application domain} and focuses on making sure the solution actually \emph{fits} its operational context.
 
 \subsection{Problem Analysis}
-A structured problem analysis will characterise the monitoring and security gaps in a representative, freshly deployed Kubernetes cluster (kubeadm, three worker nodes). The analysis will document:
+We'll do a structured analysis of the monitoring and security gaps in a representative, freshly deployed Kubernetes cluster (using kubeadm with three worker nodes). The analysis will document:
 \begin{itemize}
-    \item Alerts fired per day using only threshold-based rules.
-    \item Network flows that are invisible to the default networking stack.
-    \item Incidents that would go undetected without AI-based detection.
+    \item How many alerts fire per day using only threshold-based rules
+    \item Network flows that are invisible to the default networking stack
+    \item Incidents that would go undetected without AI-based detection
 \end{itemize}
 This method directly answers sub-question~1.
 
 \subsection{Domain Modelling}
-An ArchiMate domain model will be produced to represent the enterprise Kubernetes infrastructure: nodes, namespaces, deployments, services, ingress controllers, storage classes, and external dependencies. This model provides the shared vocabulary for the architecture design phase.
-
-\section{Workshop Research}
-
-Workshop research explores opportunities and produces concrete design artefacts.
-
-\subsection{IT Architecture Sketching}
-Using ArchiMate~3.2 notation, the following architecture views will be produced:
-\begin{itemize}
-    \item \textbf{Motivation view:} Goals, requirements, and constraints.
-    \item \textbf{Application layer view:} Monitoring components and their data flows.
-    \item \textbf{Technology layer view:} Kubernetes objects, Cilium, and the AI inference pipeline.
-    \item \textbf{Implementation and migration view:} Deployment phases.
-\end{itemize}
-
-\subsection{Prototyping}
-An iterative prototyping approach will be used to implement and refine each major component:
-\begin{enumerate}
-    \item Cilium installation and basic NetworkPolicy enforcement.
-    \item Hubble Relay and Hubble UI for flow visualisation.
-    \item Prometheus + Grafana stack with custom Kubernetes dashboards.
-    \item AI anomaly detection pipeline (training on synthetic normal-traffic baseline, inference via REST API).
-    \item Integration layer: Hubble flow exporter $\rightarrow$ OpenTelemetry Collector $\rightarrow$ AI feature store.
-\end{enumerate}
+We'll create an ArchiMate domain model representing the enterprise Kubernetes infrastructure: nodes, namespaces, deployments, services, ingress controllers, storage classes, and external dependencies. This model gives us a shared vocabulary for the architecture design phase.
 
 \section{Lab Research}
 
-Lab research tests whether the solution works as intended. It optimises for \emph{certainty}.
+Lab research tests whether the solution actually works as intended. It focuses on \emph{certainty}.
+
+\subsection{Prototyping}
+We'll use an iterative approach to implement and refine each major component, following official documentation and established practices:
+\begin{enumerate}
+    \item Cilium installation and basic NetworkPolicy enforcement
+    \item Hubble Relay and Hubble UI for flow visualization
+    \item Prometheus + Grafana stack with custom Kubernetes dashboards
+    \item AI anomaly detection pipeline (training on synthetic normal-traffic baseline, inference via REST API)
+    \item Integration layer: Hubble flow exporter $\rightarrow$ OpenTelemetry Collector $\rightarrow$ AI feature store
+\end{enumerate}
+Key resources include official project documentation (Cilium, Kubernetes, Prometheus), GitHub repositories with example implementations, and community best practices.
 
 \subsection{System Test}
-An end-to-end system test will verify that the full monitoring and security stack operates correctly: metrics are scraped, network flows are captured, anomaly detection fires on injected anomalies, and alerts reach the notification channel.
+An end-to-end system test will verify that the full monitoring and security stack operates correctly: metrics get scraped, network flows are captured, anomaly detection triggers on injected anomalies, and alerts reach the notification channel.
 
 \subsection{Security Test}
-Cilium network policies will be validated by attempting traffic flows that should be blocked (e.g.\ cross-namespace access without an explicit allow policy, egress to an unauthorised external host). Tetragon will be used to verify syscall-level enforcement.
+We'll validate Cilium network policies by trying traffic flows that should be blocked (like cross-namespace access without an explicit allow policy, or egress to an unauthorized external host). Tetragon will verify syscall-level enforcement.
 
 \subsection{Non-Functional Test}
-The following non-functional properties will be measured:
+We'll measure these non-functional properties:
 \begin{itemize}
-    \item CPU and memory overhead introduced by Cilium/eBPF relative to a Flannel baseline.
-    \item Monitoring pipeline latency (time from metric generation to alert firing).
-    \item AI inference throughput and model prediction latency under load.
+    \item CPU and memory overhead from Cilium/eBPF compared to a Flannel baseline
+    \item Monitoring pipeline latency (time from metric generation to alert firing)
+    \item AI inference throughput and model prediction latency under load
 \end{itemize}
 
 \section{Showroom Research}
 
 \subsection{Benchmark Test}
-The AI anomaly detection component will be benchmarked against a rule-based baseline using precision, recall, F1-score, false-positive rate, and MTTD (mean time to detect). Anomaly scenarios will be injected in a controlled test environment.
+We'll benchmark the AI anomaly detection component against a rule-based baseline using precision, recall, F1-score, false-positive rate, and MTTD (mean time to detect). We'll inject anomaly scenarios in a controlled test environment.
 
 \subsection{Guideline Conformity Analysis}
-The final implementation will be assessed against the CIS Kubernetes Benchmark and the CNCF Security Whitepaper recommendations. Findings will be reported as a conformity scorecard in the final research report.
+The final implementation will be assessed against the CIS Kubernetes Benchmark and CNCF Security Whitepaper recommendations. We'll report findings as a conformity scorecard in the final research report.
 
 \section{Framework Triangulation}
 
-Table~\ref{tab:triangulation} summarises the triangulation across research strategies used to answer each sub-question.
+Table~\ref{tab:triangulation} shows how we're using different research strategies to answer each sub-question.
 
 \begin{table}[H]
 \centering
@@ -114,7 +112,7 @@ Table~\ref{tab:triangulation} summarises the triangulation across research strat
 SQ1 --- Limitations of current approach & Problem analysis (Field), Literature study (Library) \\
 SQ2 --- AI/ML technique selection       & Literature study (Library), Available product analysis (Library) \\
 SQ3 --- Cilium vs.\ traditional networking & Literature study (Library), Benchmark test (Showroom) \\
-SQ4 --- Integration architecture        & IT architecture sketching (Workshop), Prototyping (Workshop) \\
+SQ4 --- Integration architecture        & IT architecture sketching (Library), Prototyping (Lab) \\
 SQ5 --- Validation                      & System test (Lab), Security test (Lab), Non-functional test (Lab), Guideline conformity (Showroom) \\
 \bottomrule
 \end{tabular}
@@ -122,10 +120,10 @@ SQ5 --- Validation                      & System test (Lab), Security test (Lab)
 
 \section{Additional Frameworks}
 
-Beyond the DOT framework, the following methodological frameworks are applied:
+Beyond the DOT framework, we're also using these methodological frameworks:
 
 \begin{itemize}
     \item \textbf{TOGAF ADM (Architecture Development Method):} The architecture design phase follows the TOGAF ADM cycle, moving from Architecture Vision through Business, Application, and Technology Architecture to the Opportunities and Solutions phase.
-    \item \textbf{ArchiMate 3.2:} Used as the modelling notation for all architecture views, ensuring interoperability and a standardised vocabulary.
-    \item \textbf{GitOps (Flux CD):} All infrastructure-as-code artefacts are managed in a Git repository and reconciled to the cluster automatically, ensuring reproducibility of the proof-of-concept environment.
+    \item \textbf{ArchiMate 3.2:} We're using this as the modeling notation for all architecture views, ensuring interoperability and a standardized vocabulary.
+    \item \textbf{GitOps (Flux CD):} All infrastructure-as-code artifacts are managed in a Git repository and automatically reconciled to the cluster, ensuring reproducibility of the proof-of-concept environment.
 \end{itemize}

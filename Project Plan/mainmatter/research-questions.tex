@@ -4,34 +4,24 @@
 \section{Main Research Question}
 
 \begin{quote}
-\textit{How can an AI-powered monitoring system, integrated with Cilium-based network security, be designed and implemented to enable proactive and automated management of a Kubernetes infrastructure?}
+\textit{How can we design and build an AI-powered monitoring system that works together with Cilium-based network security to enable proactive, automated management of Kubernetes infrastructure?}
 \end{quote}
 
 \section{Sub-Questions}
 
-The main question is decomposed into five sub-questions, each addressing a distinct aspect of the investigation:
+To answer this, we'll break it down into five focused questions, each looking at a different piece of the puzzle:
 
 \begin{enumerate}
 
-    \item \textbf{What are the key limitations of traditional infrastructure monitoring and network security approaches in Kubernetes environments?}
+    \item \textbf{What are the main problems with traditional infrastructure monitoring and network security in Kubernetes?}
 
-    This sub-question establishes the problem baseline. It examines where threshold-based alerting fails to detect real anomalies, how \texttt{kube-proxy}/\texttt{iptables} creates security blind spots, and what observability gaps exist in a default Kubernetes deployment.
+    \item \textbf{Which AI and machine learning techniques work best for detecting anomalies and predicting problems in infrastructure and network metrics?}
 
-    \item \textbf{Which AI and machine learning techniques are best suited for anomaly detection and predictive alerting on infrastructure and network metrics?}
+    \item \textbf{How does Cilium's eBPF-based approach improve network security and observability compared to traditional Kubernetes networking?}
 
-    This sub-question surveys the machine learning literature for methods applicable to time-series infrastructure data (e.g.\ Isolation Forest, LSTM autoencoders, Prophet, ARIMA). It evaluates them against criteria including latency requirements, interpretability, and the availability of labelled training data.
+    \item \textbf{What kind of integration architecture do we need so the AI monitoring system can use Cilium and Hubble data to provide correlated security and performance insights?}
 
-    \item \textbf{How does Cilium's eBPF-based architecture improve network security and observability compared to traditional Kubernetes networking solutions?}
-
-    This sub-question performs a comparative analysis of Cilium against standard Kubernetes networking (Flannel, Calico, kube-proxy), with a focus on policy expressiveness (L3--L7), performance overhead, observability depth via Hubble, and zero-trust capabilities such as transparent mutual TLS.
-
-    \item \textbf{What integration architecture is required to enable the AI monitoring system to consume Cilium and Hubble telemetry for correlated security and performance insights?}
-
-    This sub-question addresses the design challenge of unifying diverse telemetry streams — Prometheus metrics, Loki logs, OpenTelemetry traces, and Hubble network flows — into a coherent feature space for machine learning inference, and feeding alerts back into actionable responses.
-
-    \item \textbf{How can the effectiveness, performance overhead, and security posture of the integrated solution be empirically validated?}
-
-    This sub-question defines the evaluation methodology: what metrics are used to measure proactive detection quality (precision, recall, MTTD), how eBPF performance overhead is quantified, and how Cilium network-policy coverage is assessed against the CIS Kubernetes Benchmark.
+    \item \textbf{How can we test and validate that the integrated solution actually works well, doesn't slow things down too much, and improves security?}
 
 \end{enumerate}
 
