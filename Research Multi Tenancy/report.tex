@@ -1,0 +1,46 @@
+\documentclass{tudelft-report}
+
+%% Additional packages and commands
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{float}
+\usetikzlibrary{arrows.meta}
+
+%% Configure code listings
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    columns=fullflexible
+}
+
+\begin{document}
+
+\frontmatter
+
+%% Define the main parameters
+\title{Research Multi Tenancy}
+\subtitle{}
+\author{Bas Smit}
+
+\subject{Research}
+\affiliation{Fontys University of Applied Sciences}
+\coverimage{figures/Report_Cover_Image.jpg}
+\definecolor{title}{HTML}{E6E6E6}
+
+\makecover
+
+\tableofcontents
+
+\mainmatter
+
+\input{mainmatter/introduction}
+\input{mainmatter/multitenancy}
+\input{mainmatter/conclusion}
+
+\end{document}

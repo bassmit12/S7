@@ -1,0 +1,57 @@
+\begin{titlepage}
+
+\begin{center}
+
+%% Print the title
+{\makeatletter
+\largetitlestyle\fontsize{45}{45}\selectfont\@title
+\makeatother}
+
+%% Print the subtitle
+{\makeatletter
+\ifdefvoid{\@subtitle}{}{\bigskip\titlestyle\fontsize{20}{20}\selectfont\@subtitle}
+\makeatother}
+
+\bigskip
+\bigskip
+
+by
+
+\bigskip
+\bigskip
+
+%% Print the name of the author
+{\makeatletter
+\largetitlestyle\fontsize{25}{25}\selectfont\@author
+\makeatother}
+
+\vfill
+
+%% Print some more information at the bottom
+\begin{tabular}{ll}
+    Mentor: & Ederveen, Martin M.W. \\
+    Course Head: & Meulensteen, Tom T. \\
+    Project Duration: & February 2026 -- June 2026 \\
+    Faculty: & Faculty of IT, Eindhoven \\
+\end{tabular}
+
+\bigskip
+\bigskip
+
+%% Add a source and description for the cover and optional attribution for the template
+\begin{tabular}{p{15mm}p{10cm}}
+    Cover: & Kubernetes cluster visualisation \\
+    % Feel free to remove the following attribution, it is not required - still appreciated :-)
+    Style: & TU Delft Report Style, with modifications by Daan Zwaneveld
+\end{tabular}
+
+\end{center}
+
+%% Insert the Fontys logo at the bottom of the page
+\begin{tikzpicture}[remember picture, overlay]
+    \node[above=10mm] at (current page.south) {%
+        \includegraphics[width=0.35\textwidth]{figures/fontys_logo}
+    };
+\end{tikzpicture}
+
+\end{titlepage}

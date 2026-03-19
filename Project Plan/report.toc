@@ -1,0 +1,45 @@
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background and Motivation}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Project Scope}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Relevance to Enterprise Infrastructure}{2}{section.1.3}%
+\contentsline {chapter}{\numberline {2}Research Questions and Project Objectives}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Main Research Question}{3}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Sub-Questions}{3}{section.2.2}%
+\contentsline {chapter}{\numberline {3}Methodology and Research Framework}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Library Research}{5}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Literature Study}{5}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Available Product Analysis}{5}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Best, Good, and Bad Practices}{5}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Field Research}{6}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Problem Analysis}{6}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Domain Modelling}{6}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Workshop Research}{6}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}IT Architecture Sketching}{6}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Prototyping}{6}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Lab Research}{6}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}System Test}{7}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Security Test}{7}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Non-Functional Test}{7}{subsection.3.4.3}%
+\contentsline {section}{\numberline {3.5}Showroom Research}{7}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Benchmark Test}{7}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Guideline Conformity Analysis}{7}{subsection.3.5.2}%
+\contentsline {section}{\numberline {3.6}Framework Triangulation}{7}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Additional Frameworks}{7}{section.3.7}%
+\contentsline {chapter}{\numberline {4}Non-Functional Requirements}{9}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Scalability}{9}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Performance}{9}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Security}{9}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Reliability}{10}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Observability}{10}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Maintainability and Portability}{10}{section.4.6}%
+\contentsline {chapter}{\numberline {5}Planning, Timeline, and Expected Challenges}{11}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Project Timeline}{11}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Time Estimation}{12}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Expected Deliverables}{13}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Expected Challenges}{13}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Training Data for AI Anomaly Detection}{13}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}eBPF Kernel Version Compatibility}{13}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}Integration Complexity}{13}{subsection.5.4.3}%
+\contentsline {subsection}{\numberline {5.4.4}Scope Creep}{14}{subsection.5.4.4}%
+\contentsline {section}{\numberline {5.5}Supervisor Approval}{14}{section.5.5}%
+\contentsfinish 

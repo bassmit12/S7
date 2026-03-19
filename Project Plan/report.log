@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.7)  12 MAR 2026 17:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.7)  19 MAR 2026 22:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1327,7 +1327,7 @@ File: fc-english.def 2016/01/12
 brarypositioning.code.tex
 File: tikzlibrarypositioning.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-<figures/Report_Cover_Image.jpg, id=248, 4039.09pt x 6070.68pt>
+<figures/Report_Cover_Image.jpg, id=183, 4039.09pt x 6070.68pt>
 File: figures/Report_Cover_Image.jpg Graphic file (type jpg)
 <use figures/Report_Cover_Image.jpg>
 Package pdftex.def Info: figures/Report_Cover_Image.jpg  used on input line 36.
@@ -1344,7 +1344,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `RobotoSlab-TLF' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-<figures/fontys_logo_white.png, id=249, 578.16pt x 253.69781pt>
+<figures/fontys_logo_white.png, id=184, 578.16pt x 253.69781pt>
 File: figures/fontys_logo_white.png Graphic file (type png)
 <use figures/fontys_logo_white.png>
 Package pdftex.def Info: figures/fontys_logo_white.png  used on input line 36.
@@ -1411,148 +1411,174 @@ LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
  (./report.toc
 LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
 (Font)              scaled to size 10.0pt on input line 1.
- [2
-
-{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ec-tlf.enc}])
+)
 \tf@toc=\write5
 \openout5 = `report.toc'.
 
- [3] (./mainmatter/introduction.tex
+ [2
+
+{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ec-tlf.enc}] (./mainmatte
+r/introduction.tex
 Chapter 1.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
 (Font)              scaled to size 96.0pt on input line 1.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 14.4pt on input line 6.
+(Font)              scaled to size 14.4pt on input line 4.
 LaTeX Font Info:    Font shape `T1/RobotoSlab-TLF/b/n' aliased to
-(Font)              `T1/RobotoSlab-TLF/bold/n' on input line 6.
-[1
-
-
-]
-Chapter 2.
-LaTeX Font Info:    Trying to load font information for TS1+zpltlf on input lin
-e 19.
-(c:/texlive/2025/texmf-dist/tex/latex/newpx/ts1zpltlf.fd
-File: ts1zpltlf.fd 2021/11/24 v1.0 fd file for TS1/zpltlf
-)
-LaTeX Font Info:    Faking \texteuro for font family zpltlf
-(Font)              in TS1 encoding on input line 19.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 6.99997pt on input line 19.
- [2
-
-] [3] [4]
-Chapter 3.
+(Font)              `T1/RobotoSlab-TLF/bold/n' on input line 4.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/it' will be
-(Font)              scaled to size 10.0pt on input line 91.
-) (./mainmatter/infrastructure.tex [5
-
-] [6]
-Chapter 4.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 8.0pt on input line 38.
-LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
-(Font)              scaled to size 8.0pt on input line 38.
+(Font)              scaled to size 10.0pt on input line 6.
 LaTeX Font Info:    Trying to load font information for T1+npxtt on input line 
-42.
+10.
 (c:/texlive/2025/texmf-dist/tex/latex/newpx/t1npxtt.fd
 File: t1npxtt.fd 2000/12/14 v1.0
 )
 LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
-(Font)              scaled to size 10.0pt on input line 42.
+(Font)              scaled to size 10.0pt on input line 10.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `npxtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 50.
+(Font)              scaled to size 7.3pt on input line 12.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 12.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 8.0pt on input line 12.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 6.2pt on input line 12.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 6.2pt on input line 12.
+LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
+(Font)              scaled to size 8.0pt on input line 12.
+LaTeX Font Info:    Trying to load font information for TS1+zpltlf on input lin
+e 22.
+
+(c:/texlive/2025/texmf-dist/tex/latex/newpx/ts1zpltlf.fd
+File: ts1zpltlf.fd 2021/11/24 v1.0 fd file for TS1/zpltlf
+)
+LaTeX Font Info:    Font shape `TS1/zpltlf/m/n' will be
+(Font)              scaled to size 10.0pt on input line 22.
+ [1
+
+
+{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/zpl_TOsF.enc}])
+(./mainmatter/research-questions.tex [2]
+Chapter 2.
+[3
+
+]) (./mainmatter/methodology.tex [4]
+Chapter 3.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 12.0pt on input line 10.
 LaTeX Font Info:    Font shape `T1/RobotoSlab-TLF/b/n' aliased to
-(Font)              `T1/RobotoSlab-TLF/bold/n' on input line 50.
- [7
+(Font)              `T1/RobotoSlab-TLF/bold/n' on input line 10.
+[5
 
-] [8]
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 9.0pt on input line 244.
+] [6{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc}]
 LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
-(Font)              scaled to size 9.0pt on input line 244.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 5.0pt on input line 244.
-LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
-(Font)              scaled to size 5.0pt on input line 244.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/it' will be
-(Font)              scaled to size 5.0pt on input line 244.
- [9] [10])
-(./mainmatter/requirements.tex [11]
+(Font)              scaled to size 8.0pt on input line 108.
+ [7])
+(./mainmatter/requirements.tex [8]
+Chapter 4.
+[9
+
+]) (./mainmatter/planning.tex [10]
 Chapter 5.
-[12
 
-]) (./mainmatter/assignments.tex [13]
-Chapter 6.
-[14
+Underfull \hbox (badness 7064) in paragraph at lines 23--24
+[]|\T1/zpltlf/m/n/10 (+20) Systematic lit-er-a-ture study
+ []
+
+
+Underfull \hbox (badness 3439) in paragraph at lines 23--24
+\T1/zpltlf/m/n/10 (+20) (AI/ML anomaly de-tec-tion,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 24--25
+[]|\T1/zpltlf/m/n/10 (+20) Literature re-
+ []
+
+
+Underfull \hbox (badness 3884) in paragraph at lines 28--29
+\T1/zpltlf/m/n/10 (+20) clus-ter; do-main mod-elling;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--30
+[]|\T1/zpltlf/m/n/10 (+20) Architecture
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--34
+[]|\T1/zpltlf/m/n/10 (+20) Install Cil-ium; con-fig-ure
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--34
+\T1/zpltlf/m/n/10 (+20) deny); en-able Wire-Guard
+ []
+
+
+Underfull \hbox (badness 1242) in paragraph at lines 36--37
+[]|\T1/zpltlf/m/n/10 (+20) Implementation --- AI
+ []
+
+
+Underfull \hbox (badness 3250) in paragraph at lines 39--40
+[]|\T1/zpltlf/m/n/10 (+20) AI mon-i-tor-ing
+ []
+
+
+Underfull \hbox (badness 1742) in paragraph at lines 48--49
+[]|\T1/zpltlf/m/n/10 (+20) System tests; se-cu-rity tests
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--49
+\T1/zpltlf/m/n/10 (+20) over-head); bench-mark vs.
+ []
+
+
+Underfull \hbox (badness 2600) in paragraph at lines 49--50
+[]|\T1/zpltlf/m/n/10 (+20) Test & bench-
+ []
+
+[11
 
 ]
-LaTeX Font Info:    Font shape `T1/RobotoSlab-TLF/b/n' aliased to
-(Font)              `T1/RobotoSlab-TLF/bold/n' on input line 36.
- [15]
-Underfull \hbox (badness 2582) in paragraph at lines 83--83
-[]|\T1/zpltlf/m/n/10 (+20) CPU (user/sys/iowait), mem-ory
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 83--83
-[]|\T1/zpltlf/m/n/10 (+20) Operations per sec-ond
- []
-
-
-Underfull \hbox (badness 6493) in paragraph at lines 83--83
-\T1/zpltlf/m/n/10 (+20) (reads/writes/commands), mem-
- []
-
-
-Underfull \hbox (badness 2393) in paragraph at lines 83--83
-[]|\T1/zpltlf/m/n/10 (+20) Connection ta-ble util-i-sa-tion (%),
- []
-
-[16]
-Underfull \hbox (badness 10000) in paragraph at lines 109--109
-[]|\T1/zpltlf/m/n/10 (+20) Per business-critical
- []
-
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 7.3pt on input line 125.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 5.5pt on input line 125.
-[17{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc}{c:/texlive/202
-5/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}] [18]) [19] [20]
-(./report.aux)
+(Font)              scaled to size 5.5pt on input line 64.
+ [12{c:/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
+[13]) [14] (./report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2020/03/25>
  ***********
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: A7FD369DDFDE1540ABFDAB2434855A15;10902.
+(rerunfilecheck)             Checksum: AC66A93CAC9A499F4849AD0D2F5453EB;7111.
  ) 
 Here is how much of TeX's memory you used:
- 39300 strings out of 467538
- 760219 string characters out of 5423725
- 1150925 words of memory out of 5000000
- 67270 multiletter control sequences out of 15000+600000
- 773492 words of font info for 216 fonts, out of 8000000 for 9000
+ 38910 strings out of 467538
+ 753517 string characters out of 5423725
+ 1138925 words of memory out of 5000000
+ 66956 multiletter control sequences out of 15000+600000
+ 765296 words of font info for 208 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,12n,108p,1309b,1226s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/texlive/2025/texmf-dist/fonts/type1/public/newpx/NewPXMI_gnu.pfb><c:/texl
-ive/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Bold.pfb><c:/texlive/2
-025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Light.pfb><c:/texlive/2025/
-texmf-dist/fonts/type1/google/roboto/RobotoSlab-Thin.pfb><c:/texlive/2025/texmf
--dist/fonts/type1/public/newpx/pxmiaX.pfb><c:/texlive/2025/texmf-dist/fonts/typ
-e1/public/newpx/pxsys.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/txfont
-s/t1xtt.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/newpx/zplb.pfb><c:/t
-exlive/2025/texmf-dist/fonts/type1/public/newpx/zplr.pfb><c:/texlive/2025/texmf
--dist/fonts/type1/public/newpx/zplri.pfb>
-Output written on report.pdf (23 pages, 2566964 bytes).
+ 99i,12n,108p,1195b,1240s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/texlive/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Bold.pfb><c:
+/texlive/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Light.pfb><c:/tex
+live/2025/texmf-dist/fonts/type1/google/roboto/RobotoSlab-Thin.pfb><c:/texlive/
+2025/texmf-dist/fonts/type1/public/newpx/pxmiaX.pfb><c:/texlive/2025/texmf-dist
+/fonts/type1/public/newpx/pxsys.pfb><c:/texlive/2025/texmf-dist/fonts/type1/pub
+lic/txfonts/t1xtt.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/newpx/zplb
+.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/newpx/zplr.pfb><c:/texlive/
+2025/texmf-dist/fonts/type1/public/newpx/zplri.pfb>
+Output written on report.pdf (16 pages, 2524172 bytes).
 PDF statistics:
- 548 PDF objects out of 1000 (max. 8388607)
- 488 compressed objects within 5 object streams
- 116 named destinations out of 1000 (max. 500000)
- 44535 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 414 PDF objects out of 1000 (max. 8388607)
+ 364 compressed objects within 4 object streams
+ 83 named destinations out of 1000 (max. 500000)
+ 41335 words of extra memory for PDF output out of 42996 (max. 10000000)
 

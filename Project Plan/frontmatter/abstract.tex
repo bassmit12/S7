@@ -1,0 +1,12 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Enterprise Kubernetes environments face two persistent challenges: traditional threshold-based monitoring is insufficient for detecting subtle, multi-dimensional anomalies in dynamic, ephemeral workloads, and the default Kubernetes networking stack provides inadequate visibility and policy enforcement for a zero-trust security posture.
+
+This project plan outlines a research project that investigates how an AI-powered monitoring system, integrated with Cilium's eBPF-based network security and the Hubble observability layer, can be designed and implemented to enable proactive, automated management of Kubernetes infrastructure. The main research question asks how such a combined solution should be designed to detect infrastructure anomalies before they cause service degradation and enforce application-aware network policies without modifying workload code.
+
+The research is structured using the DOT (Development Oriented Triangulation) framework, combining Library research (literature study, available product analysis), Field research (problem analysis, domain modelling), Workshop research (IT architecture sketching, prototyping), Lab research (system, security, and non-functional tests), and Showroom research (benchmark testing, guideline conformity analysis). The project additionally follows the TOGAF Architecture Development Method and uses ArchiMate~3.2 for architecture modelling.
+
+The expected deliverables include a literature review, an ArchiMate architecture document, a proof-of-concept implementation (Helm charts, Flux GitOps manifests, and an AI inference pipeline), a test and benchmark report, and a final research report. The project runs from February to June 2026, with an estimated effort of 260 hours.
+
+\textbf{Keywords:} Kubernetes, Cilium, eBPF, AI anomaly detection, infrastructure monitoring, network security, zero-trust, Hubble, DOT framework

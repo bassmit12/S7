@@ -1,0 +1,10 @@
+% ============================================================
+\chapter{Conclusion}
+\label{chapter:conclusion}
+% ============================================================
+
+Of the six multi-tenancy strategies evaluated, \textbf{Separate Application Instance with Shared Infrastructure} is the most suitable for the SaZ platform in its current state. It is the only approach that requires no changes to application code, aligns naturally with the existing Helm-based deployment pipeline, and provides strong tenant isolation by default through Kubernetes namespace boundaries and separate database instances per tenant.
+
+The other strategies were ruled out for the following reasons: shared-database models (shared schema, separate schema, or row-level) all require cross-cutting code changes and carry a higher risk of data leaks; dedicated infrastructure per tenant is operationally too expensive; and hybrid multi-tenancy adds unnecessary complexity at this stage of the platform's maturity.
+
+The practical implementation path is clear: parameterise the existing Helm charts with tenant-specific values, route tenant traffic via subdomains at the Nginx ingress layer, and provision a Keycloak realm per tenant for authentication isolation. Onboarding a new tenant becomes a scripted, repeatable process that extends the existing \texttt{platformdeploy} tooling. As the platform scales and the number of tenants grows, a migration toward a hybrid model --- where lower-tier tenants share application instances with schema-level database isolation --- can reduce resource consumption without requiring a full architectural redesign.

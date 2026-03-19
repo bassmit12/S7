@@ -1,0 +1,133 @@
+\chapter{Planning, Timeline, and Expected Challenges}
+\label{chapter:planning}
+
+\section{Project Timeline}
+
+The remaining project period runs from 12 March 2026 to 28 June 2026. Working two days per week (09:00--16:00), this yields approximately 15 working weeks. Table~\ref{tab:timeline} maps each phase to a concrete date range.
+
+\begin{table}[H]
+\centering
+\caption{Project timeline.}
+\label{tab:timeline}
+\begin{tabular}{@{}p{3.8cm}p{3.2cm}p{4.8cm}p{2.5cm}@{}}
+\toprule
+\textbf{Phase} & \textbf{Dates} & \textbf{Activities} & \textbf{Deliverable} \\
+\midrule
+Project Plan
+    & 12 Mar
+    & Finalise and submit plan of approach; supervisor review and approval
+    & \textbf{This document} \\
+\midrule
+Library Research
+    & 19 Mar -- 2 Apr
+    & Systematic literature study (AI/ML anomaly detection, eBPF, Cilium, zero-trust); available product analysis
+    & Literature review \\
+\midrule
+Architecture Design
+    & 2 Apr -- 16 Apr
+    & Problem analysis on reference cluster; domain modelling; ArchiMate architecture views (TOGAF ADM phases A--C)
+    & Architecture document \\
+\midrule
+Implementation --- Cilium
+    & 16 Apr -- 7 May
+    & Install Cilium; configure CiliumNetworkPolicy (default-deny); enable WireGuard mTLS; deploy Hubble Relay and UI; validate L3--L7 policy enforcement
+    & Cilium PoC \\
+\midrule
+Implementation --- AI Monitoring
+    & 7 May -- 21 May
+    & Deploy Prometheus + Loki + OpenTelemetry stack; build AI feature pipeline (Hubble $\rightarrow$ OTel Collector $\rightarrow$ feature store); train anomaly detection model; expose inference API
+    & AI monitoring pipeline \\
+\midrule
+Integration
+    & 21 May -- 4 Jun
+    & Integrate AI alerts with AlertManager; wire Hubble flow data into ML features; end-to-end smoke tests
+    & Integrated PoC \\
+\midrule
+Testing \& Evaluation
+    & 4 Jun -- 18 Jun
+    & System tests; security tests (policy violation injection); non-functional tests (CPU/memory overhead); benchmark vs.\ threshold-based baseline
+    & Test \& benchmark report \\
+\midrule
+Report Writing
+    & 18 Jun -- 28 Jun
+    & Draft final research report; peer review; incorporate feedback; final submission
+    & \textbf{Final report} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Time Estimation}
+
+Available capacity: \textbf{2 days per week}, \textbf{09:00--16:00} (7 hours per day), from 12 March 2026 to 28 June 2026.
+
+\[
+  15 \text{ weeks} \times 2 \text{ days} \times 7 \text{ hours} = \textbf{210 hours total}
+\]
+
+Table~\ref{tab:hours} shows the estimated effort distribution per phase.
+
+\begin{table}[H]
+\centering
+\caption{Estimated effort distribution.}
+\label{tab:hours}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Phase} & \textbf{Working days} & \textbf{Hours} \\
+\midrule
+Project Plan              & 1  & 7  \\
+Library Research          & 4  & 28 \\
+Architecture Design       & 4  & 28 \\
+Implementation --- Cilium & 5  & 35 \\
+Implementation --- AI Monitoring & 4 & 28 \\
+Integration               & 3  & 21 \\
+Testing \& Evaluation     & 4  & 28 \\
+Report Writing            & 3  & 21 \\
+Buffer / contingency      & 2  & 14 \\
+\midrule
+\textbf{Total}            & \textbf{30} & \textbf{210} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Expected Deliverables}
+
+The following artefacts will be produced over the course of the project:
+
+\begin{enumerate}
+    \item \textbf{Project Plan} (12 March) --- this document.
+    \item \textbf{Literature Review} (2 April) --- a structured review covering AI/ML anomaly detection techniques, Cilium/eBPF architecture, and relevant standards.
+    \item \textbf{Architecture Document} (16 April) --- ArchiMate views (motivation, application, and technology layers) following the TOGAF ADM.
+    \item \textbf{Proof-of-Concept Implementation} (4 June) --- all infrastructure-as-code (Helm charts, Flux manifests) and the AI pipeline source code, stored in a Git repository.
+    \item \textbf{Test \& Benchmark Report} (18 June) --- structured test results including CIS Benchmark conformity scorecard, security test outcomes, and performance benchmark comparisons.
+    \item \textbf{Final Research Report} (28 June) --- a complete research report answering all research questions and providing actionable recommendations.
+\end{enumerate}
+
+\section{Expected Challenges}
+
+\subsection{Training Data for AI Anomaly Detection}
+
+Training an unsupervised anomaly detection model requires a representative baseline of normal infrastructure behaviour. Generating this baseline on a freshly provisioned test cluster means the model must be trained on synthetic or simulated workloads, which may not fully reflect the diversity of production traffic patterns. Mitigation: use an unsupervised technique (Isolation Forest) for the initial model, which does not require labelled anomaly data; supplement with synthetic anomaly injection for evaluation.
+
+\subsection{eBPF Kernel Version Compatibility}
+
+Certain Cilium features (e.g.\ WireGuard transparent encryption, socket-level load balancing) require a minimum Linux kernel version (5.10+). Bare-metal hardware running older kernels may not support all planned features. Mitigation: validate kernel version requirements early during the Cilium implementation phase (from 16 April); document any feature gaps and use alternative mechanisms (IPsec) where WireGuard is unavailable.
+
+\subsection{Integration Complexity}
+
+Correlating heterogeneous telemetry streams — Prometheus counter metrics, Loki log entries, OpenTelemetry spans, and Hubble flow records — into a unified feature vector for machine learning is non-trivial. Each data source has different cardinality, granularity, and latency characteristics. Mitigation: use the OpenTelemetry Collector as a central pipeline with explicit fan-in transformation; define a minimal feature set for the initial model and expand iteratively.
+
+\subsection{Scope Creep}
+
+The combination of AI/ML and advanced networking touches a broad technology surface. There is a risk of spending too much time on peripheral concerns (e.g.\ model hyper-parameter tuning, advanced Cilium enterprise features) at the expense of completing the core research. Mitigation: strictly follow the timeline; use timeboxing for each implementation sprint; discuss scope changes with the supervisor before acting on them.
+
+\section{Supervisor Approval}
+
+This plan of approach requires review and written approval by the supervising lecturer before research activities commence on 19 March 2026.
+
+\vspace{1cm}
+\begin{tabular}{@{}p{6cm}p{6cm}@{}}
+\textbf{Student:} & \textbf{Supervisor:} \\[2cm]
+Bas Smit & Ederveen, Martin M.W. \\
+Date: \underline{\hspace{3cm}} & Date: \underline{\hspace{3cm}} \\[0.5cm]
+Signature: \underline{\hspace{3cm}} & Signature: \underline{\hspace{3cm}} \\
+\end{tabular}

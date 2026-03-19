@@ -1,0 +1,7 @@
+\chapter{Introduction}
+\label{chapter:introduction}
+
+\textit{Samen aan Z} (SaZ) is a Kubernetes-based microservices platform currently deployed for a single customer: the Province of Antwerp. The platform consists of several independently deployed services across multiple Kubernetes namespaces (\texttt{data-api}, \texttt{survey}, \texttt{dashboard}), backed by dedicated PostgreSQL databases per domain, a MongoDB instance, a RabbitMQ message broker, and Keycloak for authentication. All services are containerised and deployed via Helm charts.
+
+At present, the platform is strictly single-tenant --- one deployment serves one organisation. As the platform matures, there is a realistic need to onboard additional customers without running a completely separate deployment per customer. This research investigates what multi-tenancy means in the context of the SaZ infrastructure, what strategies are available, and which approach is most suitable given the existing architecture.
+
