@@ -36,13 +36,15 @@ As described above, the Fontys proxy blocks external image pulls. But there's a 
 
 The CI pipeline runs on every push to `main`. It has three parallel jobs:
 
-- *Build Backend* — runs `encore build docker` to compile the Encore application and push it to `ghcr.io/bassmit12/abysscore-backend:latest`
-- *Build Gateway* — builds the Go gateway with Docker Buildx and pushes to `ghcr.io/bassmit12/abysscore-gateway:latest`
-- *Build Frontend* — builds the Next.js app with Docker Buildx and pushes to `ghcr.io/bassmit12/abysscore-frontend:latest`
+- *Build Backend* — runs `encore build docker` to compile the Encore application and push `ghcr.io/bassmit12/abysscore-backend:<sha>` and `:latest`
+- *Build Gateway* — builds the Go gateway with Docker Buildx and pushes `ghcr.io/bassmit12/abysscore-gateway:<sha>` and `:latest`
+- *Build Frontend* — builds the Next.js app with Docker Buildx and pushes `ghcr.io/bassmit12/abysscore-frontend:<sha>` and `:latest`
 
-Authentication uses a `GHCR_TOKEN` secret stored in GitHub Actions. The `GITHUB_TOKEN` built into Actions can't push to new packages, so a personal access token with `write:packages` scope is needed.
+After the three build jobs finish, an `update-manifests` job patches the image tags in `infra/k8s/*.yaml` from the previous SHA to the new one and commits the change back to `main`. ArgoCD detects the manifest update and rolls out all three deployments automatically.
 
-After images are pushed, ArgoCD picks up the change on the next sync cycle (every 3 minutes by default). There's no automatic image tag update in place yet — all Deployments use `latest`, so ArgoCD detects the change through the image digest rather than a tag change.
+One important detail: the manifest-update commit must not trigger a new build. Without a guard, the bot commit lands on `main`, triggers the workflow again, which pushes new images, updates the manifest, commits again — an infinite loop. The fix is `paths-ignore: infra/k8s/**` on the workflow trigger. The CI only fires on changes to actual source code, not on manifest-only commits.
+
+Authentication uses a `GHCR_TOKEN` secret stored in GitHub Actions. The `GITHUB_TOKEN` built into Actions fails with a 403 for new packages, so a personal access token with `write:packages` scope is required.
 
 === Environment Variables
 
